@@ -1,9 +1,13 @@
+import sys
+
+import pytest
 from click.testing import CliRunner
 
 from elasticsearch_faker.__main__ import cmd
 
 
 class Test_generate_subcmd:
+    @pytest.mark.skipif(sys.version_info <= (3, 5), reason="requires python3.5 or higher")
     def test_normal(self, mocker):
         runner = CliRunner()
         template_filename = "valid.tmpl"
