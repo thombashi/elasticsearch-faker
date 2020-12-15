@@ -5,7 +5,7 @@ from textwrap import dedent
 MODULE_NAME = "elasticsearch-faker"
 COMMAND_EPILOG = dedent(
     """\
-    Issue tracker: https://github.com/:owner/{}/issues
+    Issue tracker: https://github.com/thombashi/{}/issues
     """
 ).format(MODULE_NAME)
 
