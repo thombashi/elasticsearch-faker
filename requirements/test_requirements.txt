@@ -1,0 +1,5 @@
+mock
+pytest>=6.0.1
+pytest-md-report>=0.1
+pytest-mock
+

@@ -1,0 +1,11 @@
+include LICENSE
+include README.rst
+include pyproject.toml
+include setup.cfg
+include tox.ini
+
+recursive-include requirements *
+recursive-include tests *
+
+global-exclude __pycache__/*
+global-exclude *.pyc
