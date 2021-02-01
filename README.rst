@@ -3,7 +3,6 @@
    :depth: 2
 
 
-
 Summary
 ============================================
 `elasticsearch-faker` is a CLI tool to generate fake data for Elasticsearch.
@@ -17,9 +16,7 @@ Installation
 ============================================
 ::
 
-    git clone https://github.com/thombashi/elasticsearch-faker
-    cd elasticsearch-faker
-    pip install .
+    pip install elasticsearch-faker
 
 
 Usage
