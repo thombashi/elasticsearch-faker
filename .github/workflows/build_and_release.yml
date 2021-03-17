@@ -45,8 +45,9 @@ jobs:
         run: |
           ./build_deb_package.sh
           echo ::set-output name=dist_filepath::dist/elasticsearch-faker_${{ steps.get_version.outputs.version-without-v }}_amd64.deb
+          echo ::set-output name=dist_filepath_amd64::$(find dist/elasticsearch-faker_*.*.*_amd64.deb)
 
       - name: Release
         run: |
-          echo ${{ steps.build_deb_package.outputs.dist_filepath }}
-          md5sum ${{ steps.build_deb_package.outputs.dist_filepath }}
+          echo ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }}
+          md5sum ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }}
