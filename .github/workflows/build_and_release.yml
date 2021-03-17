@@ -1,10 +1,9 @@
 name: Build and release
 
-on: [push]
-#on:
-#  push:
-#    tags:
-#      - "v*"
+on:
+  push:
+    tags:
+      - "v*.*.*"
 
 jobs:
   build:
@@ -45,9 +44,13 @@ jobs:
         run: |
           ./build_deb_package.sh
           echo ::set-output name=dist_filepath_amd64::$(find dist/elasticsearch-faker_*.*.*_amd64.deb)
-          md5sum ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }} > md5.txt
+          md5sum ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }} > md5_amd64.txt
 
       - name: Release
-        run: |
-          echo ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }}
-          md5sum ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }}
+        uses: softprops/action-gh-release@v1
+        with:
+          body_path: md5_amd64.txt
+          files: |
+            ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
