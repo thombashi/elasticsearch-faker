@@ -41,6 +41,11 @@ jobs:
         uses: battila7/get-version-action@v2
 
       - name: Build deb package
+        id: build_deb_package
         run: |
           ./build_deb_package.sh
-          ls -lh dist/elasticsearch-faker_${{ steps.get_version.outputs.version-without-v }}_amd64.deb
+          echo ::set-output name=dist_filepath::dist/elasticsearch-faker_${{ steps.get_version.outputs.version-without-v }}_amd64.deb
+
+      - name: Release
+        run: |
+          echo ${{ steps.build_deb_package.outputs.dist_filepath }}
