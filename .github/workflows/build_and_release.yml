@@ -49,3 +49,4 @@ jobs:
       - name: Release
         run: |
           echo ${{ steps.build_deb_package.outputs.dist_filepath }}
+          md5sum ${{ steps.build_deb_package.outputs.dist_filepath }}
