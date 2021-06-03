@@ -25,7 +25,7 @@ jobs:
       - name: Install pip
         id: install-pip
         run: |
-          python -m pip install --upgrade "pip>=21.1"
+          python -m pip install --upgrade "pip>=21.1" distro
 
       - name: Get pip cache dir
         id: pip-cache
@@ -48,8 +48,11 @@ jobs:
         id: build_deb_package
         run: |
           ./build_deb_package.sh
+          codename=$(python -m distro --json | jq --raw-output .codename)
+
           echo ::set-output name=dist_filepath_amd64::$(find dist/elasticsearch-faker-*_*.*.*_amd64.deb)
-          md5sum ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }} > md5_amd64.txt
+
+          sha256sum ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }} > sha256sum_${codename}_amd64.txt
 
       - name: Release
         uses: softprops/action-gh-release@v1
