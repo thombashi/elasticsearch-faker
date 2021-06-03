@@ -60,8 +60,8 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          body_path: md5_amd64.txt
           files: |
             ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }}
+            md5_amd64.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
