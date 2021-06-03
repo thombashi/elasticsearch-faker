@@ -49,19 +49,22 @@ jobs:
         run: |
           ./build_deb_package.sh
           codename=$(python -m distro --json | jq --raw-output .codename)
+          checksum_filename=sha256sum_${codename}_amd64.txt
 
           echo "codename=${codename}"
 
-          echo "::set-output name=codename=::$(echo ${codename})"
-          echo "::set-output name=dist_filepath_amd64::$(find dist/elasticsearch-faker-*_*.*.*_amd64.deb)"
+          sha256sum ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }} > "$checksum_filename"
 
-          sha256sum ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }} > sha256sum_${codename}_amd64.txt
+          echo "::debug::checksum=$checksum_filename"
+
+          echo "::set-output name=checksum_file::$checksum_filename"
+          echo "::set-output name=dist_filepath_amd64::$(find dist/elasticsearch-faker-*_*.*.*_amd64.deb)"
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
             ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }}
-            sha256sum_${{ steps.build_deb_package.outputs.codename }}_amd64.txt
+            ${{ steps.build_deb_package.outputs.checksum_file }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
