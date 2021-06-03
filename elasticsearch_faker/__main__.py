@@ -18,6 +18,7 @@ from ._const import COMMAND_EPILOG, MODULE_NAME, Context, Default
 from ._es_client import create_es_client
 from ._generator import FakeDocGenerator
 from ._logger import LogLevel, initialize_logger, logger
+from ._print import print_dict
 from ._provider import get_locals, re_provider
 from ._template import check_template
 from .subcmd.provider import provider
@@ -319,6 +320,29 @@ def validate(ctx, template_filepath):
         check_template(locale, f.read())
 
     click.echo("Schema file at {} is valid.".format(template_filepath))
+
+
+@cmd.command(epilog=COMMAND_EPILOG)
+@click.pass_context
+@click.argument("host", type=str)
+@click.option(
+    "--index",
+    "index_name",
+    metavar="NAME",
+    default=Default.INDEX,
+    help="Path to a faker template file. Defaults to {}.".format(Default.INDEX),
+)
+def show_stats(ctx, host: str, index_name: str):
+    es_client = create_es_client(host, dry_run=False)
+    stats = es_client.fetch_stats(index_name)
+
+    try:
+        primaries_stats = stats["primaries"]
+    except KeyError as e:
+        logger.error(e)
+        sys.exit(errno.ENOENT)
+
+    print_dict(primaries_stats)
 
 
 cmd.add_command(provider)
