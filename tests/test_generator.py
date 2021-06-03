@@ -28,32 +28,52 @@ class TestFakeDocGenerator:
             index_name="test_index",
             fake=fake,
         )
-        output = generator.generate_docs(bulk_size=2)
+        output = generator.generate_docs(bulk_size=2, worker_id=0)
         print(json.dumps(output, indent=4))
         assert output == [
-            {"index": {"_index": "test_index", "_id": "e3e70682-c209-4cac-a29f-6fbed82c07cd"}},
+            {
+                "index": {
+                    "_index": "test_index",
+                    "_id": "e3e70682-c209-4cac-a29f-6fbed82c07cd-0",
+                },
+            },
             {
                 "name": "David Dixon",
-                "address": "75938 Donald Corner Suite 892 Lake Rachel, MS 13700",
+                "address": "5938 Juan Throughway Apt. 948 West Corey, TX 43780",
             },
-            {"index": {"_index": "test_index", "_id": "9c6316b9-50f2-4455-af25-e2a25a921187"}},
             {
-                "name": "Christine Tran",
-                "address": "80160 Clayton Highway Suite 139 Lake Douglasmouth, WY 67077",
+                "index": {
+                    "_index": "test_index",
+                    "_id": "5a921187-19c7-4df4-8f4f-f31e78de5857-0",
+                }
+            },
+            {
+                "name": "Levi Durham",
+                "address": "Unit 7784 Box 0801 DPO AP 52775",
             },
         ]
 
-        output = generator.generate_docs(bulk_size=2)
+        output = generator.generate_docs(bulk_size=2, worker_id=0)
         print(json.dumps(output, indent=4))
         assert output == [
-            {"index": {"_index": "test_index", "_id": "1beb3711-7d41-4602-aece-328bff7b118e"}},
             {
-                "name": "Eddie Martinez",
-                "address": "98947 Lauren Harbors Apt. 232 Port Jordanton, CT 20102",
+                "index": {
+                    "_index": "test_index",
+                    "_id": "ab0c1681-c8f8-43d0-9329-0a4cb5d32b16-0",
+                }
             },
-            {"index": {"_index": "test_index", "_id": "148b2758-d7ab-4928-89e4-69e6ec62b2c8"}},
             {
-                "name": "Tammy Fernandez",
-                "address": "33969 Travis Port Suite 515 Tomstad, ID 96378",
+                "name": "Lisa Clayton",
+                "address": "139 John Divide Suite 115 Rodriguezside, VT 16860",
+            },
+            {
+                "index": {
+                    "_index": "test_index",
+                    "_id": "ec188efb-d080-466e-952f-233a8c25166a-0",
+                }
+            },
+            {
+                "name": "Tracey Morrison",
+                "address": "96593 White View Apt. 094 Jonesberg, FL 05565",
             },
         ]

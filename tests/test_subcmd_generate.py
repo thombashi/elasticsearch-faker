@@ -47,4 +47,4 @@ class Test_generate_subcmd:
 
             print(result.stdout)
             bulk_put.assert_called_once()
-            generate_docs.assert_called_once_with(bulk_size=200)
+            generate_docs.assert_called_once_with(bulk_size=200, worker_id=0)
