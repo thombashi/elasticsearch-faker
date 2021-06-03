@@ -33,6 +33,10 @@ class ElasticsearchClientInterface(metaclass=abc.ABCMeta):
     def refresh(self, index_name: str) -> None:
         pass
 
+    @abc.abstractclassmethod
+    def fetch_stats(self, index_name: str) -> Dict:
+        pass
+
 
 class NullElasticsearchClient(ElasticsearchClientInterface):
     def create_index(self, index_name: str, mapping_filepath: str) -> None:
