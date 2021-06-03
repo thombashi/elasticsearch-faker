@@ -6,7 +6,7 @@ import sys
 from typing import Dict, List
 
 from elasticsearch import Elasticsearch
-from elasticsearch.exceptions import RequestError, TransportError
+from elasticsearch.exceptions import NotFoundError, RequestError, TransportError
 
 from ._const import Default
 from ._logger import logger
@@ -135,7 +135,11 @@ class ElasticsearchClient(ElasticsearchClientInterface):
         self.__es.indices.refresh(index=index_name, request_timeout=Default.TIMEOUT)
 
     def fetch_stats(self, index_name: str) -> Dict:
-        return self.__es.indices.stats(index=index_name, metric="_all")
+        try:
+            return self.__es.indices.stats(index=index_name, metric="_all")
+        except NotFoundError as e:
+            logger.error(e)
+            sys.exit(errno.ENOENT)
 
 
 def create_es_client(host: str, dry_run: bool) -> ElasticsearchClientInterface:
