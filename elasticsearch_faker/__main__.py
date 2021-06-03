@@ -47,24 +47,6 @@ def _read_template_text(template_filepath: str, use_stdin: bool) -> str:
     return template_text
 
 
-def _create_index(es: Elasticsearch, index_name: str, mapping_filepath: str) -> None:
-    if not mapping_filepath:
-        return
-
-    with open(mapping_filepath) as f:
-        mappings = json.load(f)
-
-    try:
-        result = es.indices.create(index=index_name, body=mappings)
-        logger.debug(result)
-    except TransportError as e:
-        if e.error == "resource_already_exists_exception":
-            # ignore already existing index
-            logger.debug(e)
-        else:
-            raise
-
-
 @click.group(context_settings=CONTEXT_SETTINGS, epilog=COMMAND_EPILOG)
 @click.version_option(version=__version__, message="%(prog)s %(version)s")
 @click.option("--debug", "log_level", flag_value=LogLevel.DEBUG, help="For debug print.")
