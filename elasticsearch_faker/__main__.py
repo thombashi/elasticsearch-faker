@@ -163,7 +163,6 @@ def generate(
 
     locale = ctx.obj[Context.LOCALE]
     seed = ctx.obj[Context.SEED]
-    verbosity_level = ctx.obj[Context.VERBOSITY_LEVEL]
     start_time = time.time()
 
     logger.debug(
