@@ -33,6 +33,8 @@ with open(os.path.join(REQUIREMENT_DIR, "requirements.txt")) as f:
 with open(os.path.join(REQUIREMENT_DIR, "test_requirements.txt")) as f:
     TESTS_REQUIRES = [line.strip() for line in f if line.strip()]
 
+build_exe_requires = ["pyinstaller>=4.3"]
+
 setuptools.setup(
     name=MODULE_NAME,
     version=pkg_info["__version__"],
@@ -52,7 +54,10 @@ setuptools.setup(
     },
     python_requires=">=3.5",
     install_requires=INSTALL_REQUIRES,
-    extras_require={"test": TESTS_REQUIRES},
+    extras_require={
+        "buildexe": build_exe_requires,
+        "test": TESTS_REQUIRES,
+    },
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
