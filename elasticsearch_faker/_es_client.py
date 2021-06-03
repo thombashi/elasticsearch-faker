@@ -136,10 +136,12 @@ class ElasticsearchClient(ElasticsearchClientInterface):
 
     def fetch_stats(self, index_name: str) -> Dict:
         try:
-            return self.__es.indices.stats(index=index_name, metric="_all")
+            stats = self.__es.indices.stats(index=index_name, metric="_all")
         except NotFoundError as e:
             logger.error(e)
             sys.exit(errno.ENOENT)
+
+        return stats["indices"][index_name]
 
 
 def create_es_client(host: str, dry_run: bool) -> ElasticsearchClientInterface:

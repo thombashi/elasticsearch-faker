@@ -27,11 +27,18 @@ class FakeDocGenerator:
     def generate_doc(self) -> Dict:
         return self.__generate_fake_doc()
 
-    def generate_docs(self, bulk_size: int) -> List[Dict]:
+    def generate_docs(self, bulk_size: int, worker_id: int) -> List[Dict]:
         docs = []
 
         for i in range(bulk_size):
-            docs.append({"index": {"_index": self.__index_name, "_id": self.__id_fake.uuid4()}})
+            docs.append(
+                {
+                    "index": {
+                        "_index": self.__index_name,
+                        "_id": "{}-{}".format(self.__id_fake.uuid4(), worker_id),
+                    }
+                }
+            )
             docs.append(self.__generate_fake_doc())
 
         return docs

@@ -4,6 +4,8 @@ import errno
 import json
 import sys
 import time
+from concurrent import futures
+from typing import Tuple
 
 import click
 from elasticsearch import Elasticsearch
@@ -149,6 +151,14 @@ def version(ctx):
     is_flag=True,
     help="Delete the index if already exists before generating docs.",
 )
+@click.option(
+    "-j",
+    "--jobs",
+    "num_worker",
+    type=int,
+    default=1,
+    help="Number of jobs. Defaults to {}.".format(1),
+)
 @click.option("--stdin", "use_stdin", is_flag=True, help="Read a faker template from stdin.")
 @click.option("--dry-run", is_flag=True, help="Do no harm.")
 def generate(
@@ -160,6 +170,7 @@ def generate(
     num_doc,
     bulk_size,
     delete_index,
+    num_worker,
     use_stdin,
     dry_run,
 ):
@@ -204,12 +215,81 @@ def generate(
     if num_doc == 1:
         sys.exit(es_client.put(index_name, doc_generator.generate_doc()))
 
-    gen_count = 0
+    if num_worker == 1:
+        _, gen_doc_count = gen_doc_worker(
+            host=host,
+            dry_run=dry_run,
+            doc_generator=doc_generator,
+            index_name=index_name,
+            num_doc=num_doc,
+            bulk_size=bulk_size,
+        )
+        logger.info("generate {} docs to {}".format(gen_doc_count, index_name))
+    else:
+        with futures.ProcessPoolExecutor(num_worker) as executor:
+            future_list = []
+            worker_num_doc = [(num_doc + i) // num_worker for i in range(num_worker)]
 
-    with tqdm(desc="generate docs", total=num_doc, unit="docs") as pbar:
-        while gen_count < num_doc:
-            next_bulk_size = min(bulk_size, num_doc - gen_count)
-            docs = doc_generator.generate_docs(bulk_size=next_bulk_size)
+            logger.debug(
+                "split documents to distribute document generating workers: {}".format(
+                    worker_num_doc
+                )
+            )
+
+            for worker_id in range(num_worker):
+                future_list.append(
+                    executor.submit(
+                        gen_doc_worker,
+                        host,
+                        dry_run,
+                        doc_generator,
+                        index_name,
+                        worker_num_doc[worker_id],
+                        bulk_size,
+                        worker_id,
+                    )
+                )
+
+            for future in futures.as_completed(future_list):
+                worker_id, gen_doc_count = future.result()
+                logger.info(
+                    "worker {} completed: generate {} docs to {}".format(
+                        worker_id, gen_doc_count, index_name
+                    )
+                )
+
+    es_client.refresh(index_name=index_name)
+
+    logger.info("completed in {:.1f} secs".format(time.time() - start_time))
+
+    stats = es_client.fetch_stats(index_name)
+    # total_stats = stats["indices"][index_name]["total"]
+    primaries_stats = stats["primaries"]
+    logger.info("store.size: {:.1f} KB".format(primaries_stats["store"]["size_in_bytes"] / 1024))
+    logger.info("docs.count: {:d}".format(primaries_stats["docs"]["count"]))
+
+
+def gen_doc_worker(
+    host: str,
+    dry_run: bool,
+    doc_generator: FakeDocGenerator,
+    index_name: str,
+    num_doc: int,
+    bulk_size: int,
+    worker_id: int = 0,
+) -> Tuple[int, int]:
+    es_client = create_es_client(host, dry_run)
+    gen_doc_count = 0
+
+    with tqdm(
+        desc="generate docs worker #{}".format(worker_id),
+        total=num_doc,
+        unit="docs",
+        # position=worker_id + 1,  # currently not using position to avoid display corruption
+    ) as pbar:
+        while gen_doc_count < num_doc:
+            next_bulk_size = min(bulk_size, num_doc - gen_doc_count)
+            docs = doc_generator.generate_docs(bulk_size=next_bulk_size, worker_id=worker_id)
 
             try:
                 put_count = es_client.bulk_put(index_name, docs)
@@ -219,19 +299,10 @@ def generate(
             if put_count == 0:
                 break
 
-            gen_count += put_count
+            gen_doc_count += put_count
             pbar.update(put_count)
 
-    es_client.refresh(index_name=index_name)
-
-    logger.info("generate {} docs to {}".format(gen_count, index_name))
-    # logger.info("docs.count: {}".format(stats["docs"]["count"]))
-    logger.info("completed in {:.1f} secs".format(time.time() - start_time))
-
-    stats = es_client.fetch_stats(index_name)
-    if "indices" in stats:
-        stats = stats["indices"][index_name]["total"]
-        logger.info("store.size: {:.1f} KB".format(stats["store"]["size_in_bytes"] / 1024))
+    return (worker_id, gen_doc_count)
 
 
 @cmd.command(epilog=COMMAND_EPILOG)
