@@ -4,4 +4,5 @@ envinfopy>=0.0.3,<1
 Faker>=1.0.8,<9
 Jinja2>=2.8,<3
 loguru>=0.4.1,<1
+Pygments>=2.2.0,<3
 tqdm>=4.19.5,<5
