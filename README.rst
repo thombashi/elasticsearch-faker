@@ -14,9 +14,19 @@ Summary
 
 Installation
 ============================================
+
+Installation: pip
+------------------------------
 ::
 
     pip install elasticsearch-faker
+
+Installation: dpkg (Ubuntu)
+--------------------------------------------
+
+1. Navigate to `Releases page <https://github.com/thombashi/elasticsearch-faker/releases>`__
+2. Download the latest ``deb`` package
+3. Install with ``dpkg -i`` command
 
 
 Usage
