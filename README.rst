@@ -7,9 +7,17 @@ Summary
 ============================================
 `elasticsearch-faker` is a CLI tool to generate fake data for Elasticsearch.
 
+.. image:: https://badge.fury.io/py/elasticsearch-faker.svg
+    :target: https://badge.fury.io/py/elasticsearch-faker
+    :alt: PyPI package version
+
 .. image:: https://github.com/thombashi/elasticsearch-faker/workflows/Tests/badge.svg
     :target: https://github.com/thombashi/elasticsearch-faker/actions?query=workflow%3ATests
-    :alt: Linux/macOS/Windows CI status
+    :alt: Tests CI status
+
+.. image:: https://github.com/thombashi/elasticsearch-faker/actions/workflows/build_and_release.yml/badge.svg
+    :target: https://github.com/thombashi/elasticsearch-faker/actions/workflows/build_and_release.yml
+    :alt: Build and release CI status
 
 
 Installation
