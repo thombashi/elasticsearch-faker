@@ -1,4 +1,5 @@
 import re
+from typing import List
 
 import click
 from faker import Factory, Faker
@@ -29,7 +30,7 @@ def list(ctx):
 @provider.command()
 @click.argument("pattern", type=str)
 @click.pass_context
-def search(ctx, pattern):
+def search(ctx, pattern: str):
     """
     Search for providers by pattern.
     """
@@ -47,7 +48,7 @@ def search(ctx, pattern):
 @provider.command()
 @click.argument("providers", type=str, nargs=-1)
 @click.pass_context
-def example(ctx, providers):
+def example(ctx, providers: List[str]):
     """
     List available providers with examples.
     """

@@ -67,7 +67,7 @@ def _read_template_text(template_filepath: str, use_stdin: bool) -> str:
     help="",
 )
 @click.pass_context
-def cmd(ctx, log_level, verbosity_level, locale, seed):
+def cmd(ctx, log_level: str, verbosity_level: int, locale: str, seed: int):
     """
     Faker for Elasticsearch
     """
@@ -143,16 +143,16 @@ def version(ctx):
 @click.option("--dry-run", is_flag=True, help="Do no harm.")
 def generate(
     ctx,
-    host,
-    index_name,
-    mapping_filepath,
-    template_filepath,
-    num_doc,
-    bulk_size,
-    delete_index,
-    num_worker,
-    use_stdin,
-    dry_run,
+    host: str,
+    index_name: str,
+    mapping_filepath: str,
+    template_filepath: str,
+    num_doc: int,
+    bulk_size: int,
+    delete_index: bool,
+    num_worker: int,
+    use_stdin: bool,
+    dry_run: bool,
 ):
     """
     Generate fake data and put it to Elasticsearch
@@ -287,7 +287,7 @@ def gen_doc_worker(
 @cmd.command(epilog=COMMAND_EPILOG)
 @click.argument("template_filepath", type=click.Path(exists=True))
 @click.pass_context
-def validate(ctx, template_filepath):
+def validate(ctx, template_filepath: str):
     """
     Check that a faker template file is well formed.
     """
