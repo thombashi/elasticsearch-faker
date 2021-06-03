@@ -21,7 +21,7 @@ fmt:
 
 .PHONY: release
 release:
-	@python setup.py release --sign
+	@$(PYTHON) setup.py release --sign --search-dir elasticsearch_faker
 	@make clean
 
 .PHONY: setup
