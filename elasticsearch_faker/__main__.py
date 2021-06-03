@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 
 import errno
-import json
 import sys
 import time
 from concurrent import futures
 from typing import Tuple
 
 import click
-from elasticsearch import Elasticsearch
-from elasticsearch.exceptions import TransportError
 from faker import Factory, Faker
 from tqdm import tqdm
 
