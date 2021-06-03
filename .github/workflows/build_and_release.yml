@@ -50,7 +50,8 @@ jobs:
           ./build_deb_package.sh
           codename=$(python -m distro --json | jq --raw-output .codename)
 
-          echo ::set-output name=dist_filepath_amd64::$(find dist/elasticsearch-faker-*_*.*.*_amd64.deb)
+          echo "::set-output name=codename=::$codename"
+          echo "::set-output name=dist_filepath_amd64::$(find dist/elasticsearch-faker-*_*.*.*_amd64.deb)"
 
           sha256sum ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }} > sha256sum_${codename}_amd64.txt
 
@@ -59,6 +60,6 @@ jobs:
         with:
           files: |
             ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }}
-            md5_amd64.txt
+            sha256sum_${{ steps.build_deb_package.outputs.codename }}_amd64.txt
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
