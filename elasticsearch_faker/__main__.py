@@ -121,7 +121,7 @@ def version(ctx):
     "index_name",
     metavar="NAME",
     default=Default.INDEX,
-    help="Path to a faker template file. Defaults to {}.".format(Default.INDEX),
+    help="Name of an index to create. Defaults to {}.".format(Default.INDEX),
 )
 @click.option("--mapping", "mapping_filepath", type=click.Path(), help="Path to a mapping file.")
 @click.option(
