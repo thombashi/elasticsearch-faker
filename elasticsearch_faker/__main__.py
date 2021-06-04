@@ -263,7 +263,7 @@ def gen_doc_worker(
     gen_doc_count = 0
 
     with tqdm(
-        desc="generate docs worker #{}".format(worker_id),
+        desc="document generator #{}".format(worker_id),
         total=num_doc,
         unit="docs",
         # position=worker_id + 1,  # currently not using position to avoid display corruption
