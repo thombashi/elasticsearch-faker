@@ -137,6 +137,10 @@ class ElasticsearchClient(ElasticsearchClientInterface):
 
         return put_count
 
+    def flush(self, index_name: str) -> None:
+        logger.debug("flush {}".format(index_name))
+        self.__es.indices.flush(index=index_name, request_timeout=Default.TIMEOUT)
+
     def refresh(self, index_name: str) -> None:
         logger.debug("refresh {}".format(index_name))
         self.__es.indices.refresh(index=index_name, request_timeout=Default.TIMEOUT)
