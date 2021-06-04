@@ -231,11 +231,13 @@ def generate(
 
             for future in futures.as_completed(future_list):
                 worker_id, gen_doc_count = future.result()
+                """
                 logger.info(
                     "worker {} completed: generate {} docs to {}".format(
                         worker_id, gen_doc_count, index_name
                     )
                 )
+                """
 
     es_client.refresh(index_name=index_name)
 
