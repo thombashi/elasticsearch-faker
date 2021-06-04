@@ -34,6 +34,10 @@ class ElasticsearchClientInterface(metaclass=abc.ABCMeta):
         pass
 
     @abc.abstractclassmethod
+    def count_docs(self, index_name: str) -> int:
+        pass
+
+    @abc.abstractclassmethod
     def fetch_stats(self, index_name: str) -> Dict:
         pass
 
@@ -58,6 +62,9 @@ class NullElasticsearchClient(ElasticsearchClientInterface):
 
     def refresh(self, index_name: str) -> None:
         logger.debug("refresh {}".format(index_name))
+
+    def count_docs(self, index_name: str) -> int:
+        return 0
 
     def fetch_stats(self, index_name: str) -> Dict:
         return {}
@@ -133,6 +140,9 @@ class ElasticsearchClient(ElasticsearchClientInterface):
     def refresh(self, index_name: str) -> None:
         logger.debug("refresh {}".format(index_name))
         self.__es.indices.refresh(index=index_name, request_timeout=Default.TIMEOUT)
+
+    def count_docs(self, index_name: str) -> int:
+        return int(self.__es.cat.count(index=index_name, params={"h": "count"}))
 
     def fetch_stats(self, index_name: str) -> Dict:
         try:
