@@ -44,6 +44,10 @@ def _read_template_text(template_filepath: str, use_stdin: bool) -> str:
     return template_text
 
 
+def to_readable_size(size_in_bytes: int) -> float:
+    return size_in_bytes / 1024 ** 2
+
+
 @click.group(context_settings=CONTEXT_SETTINGS, epilog=COMMAND_EPILOG)
 @click.version_option(version=__version__, message="%(prog)s %(version)s")
 @click.option("--debug", "log_level", flag_value=LogLevel.DEBUG, help="For debug print.")
@@ -183,6 +187,8 @@ def generate(
         es_client.delete_index(index_name)
 
     es_client.create_index(index_name, mapping_filepath)
+    primaries_stats_before = es_client.fetch_stats(index_name)["primaries"]
+    org_docs_count = es_client.count_docs(index_name)
 
     doc_generator = FakeDocGenerator(
         template=template_text,
@@ -241,13 +247,31 @@ def generate(
 
     es_client.refresh(index_name=index_name)
 
-    logger.info("completed in {:.1f} secs".format(time.time() - start_time))
+    primaries_stats_after = es_client.fetch_stats(index_name)["primaries"]
+    current_store_size = to_readable_size(primaries_stats_after["store"]["size_in_bytes"])
+    # current_docs_count = primaries_stats_after["docs"]["count"]
+    current_docs_count = es_client.count_docs(index_name)
+    diff_docs_count = current_docs_count - org_docs_count
+    elapse_secs = time.time() - start_time
 
-    stats = es_client.fetch_stats(index_name)
-    # total_stats = stats["indices"][index_name]["total"]
-    primaries_stats = stats["primaries"]
-    logger.info("store.size: {:.1f} KB".format(primaries_stats["store"]["size_in_bytes"] / 1024))
-    logger.info("docs.count: {:d}".format(primaries_stats["docs"]["count"]))
+    click.echo(
+        "\n".join(
+            [
+                "\n[Results]",
+                "target index: {}".format(index_name),
+                "completed in {:,.1f} secs".format(elapse_secs),
+                "current store.size: {:,.1f} MB".format(current_store_size),
+                "current docs.count: {:,}".format(current_docs_count),
+                "generated store.size: {:,.1f} MB".format(
+                    current_store_size
+                    - to_readable_size(primaries_stats_before["store"]["size_in_bytes"])
+                ),
+                "generated docs.count: {:,}".format(diff_docs_count),
+                "generated docs/secs: {:,.1f}".format(diff_docs_count / elapse_secs),
+                "bulk size: {:,}".format(bulk_size),
+            ]
+        )
+    )
 
 
 def gen_doc_worker(
