@@ -104,7 +104,7 @@ class ElasticsearchClient(ElasticsearchClientInterface):
 
     def bulk_put(self, index_name: str, docs: List[Dict]) -> int:
         try:
-            r = self.__es.bulk(index=index_name, body=docs)
+            r = self.__es.bulk(index=index_name, body=docs, timeout="180s")
         except RequestError as e:
             logger.error(e)
             raise RuntimeError(e)
