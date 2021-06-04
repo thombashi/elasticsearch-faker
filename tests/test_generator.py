@@ -1,6 +1,8 @@
 import json
+import sys
 from textwrap import dedent
 
+import pytest
 from faker import Factory, Faker
 
 from elasticsearch_faker._generator import FakeDocGenerator
@@ -8,6 +10,7 @@ from elasticsearch_faker._provider import re_provider
 
 
 class TestFakeDocGenerator:
+    @pytest.mark.skipif(sys.version_info < (3, 6), reason="requires python3.6 or higher")
     def test_normal_generate_docs(self):
         fake = Factory.create()
         Faker.seed(0)
