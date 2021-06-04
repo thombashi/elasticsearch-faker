@@ -29,22 +29,21 @@ class Test_generate_subcmd:
             generate_docs = mocker.patch(
                 "elasticsearch_faker._generator.FakeDocGenerator.generate_docs"
             )
-            result = runner.invoke(
-                cmd,
-                [
-                    "--debug",
-                    "generate",
-                    "loalhost:9200",
-                    "--template",
-                    template_filename,
-                    "-n",
-                    900,
-                    "--bulk-size",
-                    200,
-                    "--dry-run",
-                ],
-            )
+            options = [
+                "--debug",
+                "generate",
+                "loalhost:9200",
+                "--template",
+                template_filename,
+                "-n",
+                900,
+                "--bulk-size",
+                200,
+                "--dry-run",
+            ]
+            result = runner.invoke(cmd, options)
 
+            print(" ".join(str(opt) for opt in options), file=sys.stderr)
             print(result.stdout)
             bulk_put.assert_called_once()
             generate_docs.assert_called_once_with(bulk_size=200, worker_id=0)
