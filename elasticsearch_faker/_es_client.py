@@ -67,7 +67,7 @@ class NullElasticsearchClient(ElasticsearchClientInterface):
         return 0
 
     def fetch_stats(self, index_name: str) -> Dict:
-        return {}
+        return {"primaries": {"store": {"size_in_bytes": 0}}}
 
 
 class ElasticsearchClient(ElasticsearchClientInterface):
