@@ -4,7 +4,7 @@ import re
 import sys
 from difflib import SequenceMatcher
 from typing import Dict  # noqa
-from typing import AbstractSet, List, Sequence
+from typing import AbstractSet, List, Sequence, Tuple
 
 from faker import Factory
 
@@ -33,52 +33,50 @@ def _get_valid_providers(locale: str) -> Sequence[str]:
 
 
 _provider_cache = {}  # type: Dict[str, AbstractSet]
-_valid_locals = frozenset(
-    [
-        "ar_EG",
-        "ar_PS",
-        "ar_SA",
-        "bs_BA",
-        "bg_BG",
-        "cs_CZ",
-        "de_DE",
-        "dk_DK",
-        "el_GR",
-        "en_AU",
-        "en_CA",
-        "en_GB",
-        "en_NZ",
-        "en_US",
-        "es_ES",
-        "es_MX",
-        "et_EE",
-        "fa_IR",
-        "fi_FI",
-        "fr_FR",
-        "hi_IN",
-        "hr_HR",
-        "hu_HU",
-        "it_IT",
-        "ja_JP",
-        "ko_KR",
-        "lt_LT",
-        "lv_LV",
-        "ne_NP",
-        "nl_NL",
-        "no_NO",
-        "pl_PL",
-        "pt_BR",
-        "pt_PT",
-        "ro_RO",
-        "ru_RU",
-        "sl_SI",
-        "sv_SE",
-        "tr_TR",
-        "uk_UA",
-        "zh_CN",
-        "zh_TW",
-        "ka_GE",
-    ]
+_valid_locals = (
+    "ar_EG",
+    "ar_PS",
+    "ar_SA",
+    "bs_BA",
+    "bg_BG",
+    "cs_CZ",
+    "de_DE",
+    "dk_DK",
+    "el_GR",
+    "en_AU",
+    "en_CA",
+    "en_GB",
+    "en_NZ",
+    "en_US",
+    "es_ES",
+    "es_MX",
+    "et_EE",
+    "fa_IR",
+    "fi_FI",
+    "fr_FR",
+    "hi_IN",
+    "hr_HR",
+    "hu_HU",
+    "it_IT",
+    "ja_JP",
+    "ko_KR",
+    "lt_LT",
+    "lv_LV",
+    "ne_NP",
+    "nl_NL",
+    "no_NO",
+    "pl_PL",
+    "pt_BR",
+    "pt_PT",
+    "ro_RO",
+    "ru_RU",
+    "sl_SI",
+    "sv_SE",
+    "tr_TR",
+    "uk_UA",
+    "zh_CN",
+    "zh_TW",
+    "ka_GE",
 )
 
 
@@ -109,7 +107,7 @@ def get_providers(locale: str) -> AbstractSet[str]:
     return _provider_cache[locale]
 
 
-def get_locals() -> AbstractSet[str]:
+def get_locals() -> Tuple:
     return _valid_locals
 
 
