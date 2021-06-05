@@ -27,5 +27,5 @@ class Context(Enum):
 class Default:
     BULK_SIZE = 200
     INDEX = "test_index"
-    NUM_DOC = 500
+    NUM_DOC = 1000
     TIMEOUT = 300
