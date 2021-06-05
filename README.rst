@@ -54,7 +54,7 @@ Command help
       --debug                         For debug print.
       -q, --quiet                     Suppress execution log messages.
       -v, --verbose                   [x>=0]
-      --locale [ar_EG|zh_CN|ka_GE|fr_FR|hi_IN|ko_KR|bg_BG|ne_NP|en_CA|nl_NL|ar_PS|en_US|el_GR|tr_TR|lt_LT|de_DE|no_NO|pt_BR|uk_UA|ja_JP|dk_DK|es_ES|pl_PL|sl_SI|it_IT|pt_PT|lv_LV|cs_CZ|fi_FI|fa_IR|hu_HU|ro_RO|en_AU|hr_HR|bs_BA|en_GB|zh_TW|en_NZ|ru_RU|sv_SE|es_MX|ar_SA|et_EE]
+      --locale [ar_EG|ar_PS|ar_SA|bs_BA|bg_BG|cs_CZ|de_DE|dk_DK|el_GR|en_AU|en_CA|en_GB|en_NZ|en_US|es_ES|es_MX|et_EE|fa_IR|fi_FI|fr_FR|hi_IN|hr_HR|hu_HU|it_IT|ja_JP|ko_KR|lt_LT|lv_LV|ne_NP|nl_NL|no_NO|pl_PL|pt_BR|pt_PT|ro_RO|ru_RU|sl_SI|sv_SE|tr_TR|uk_UA|zh_CN|zh_TW|ka_GE]
                                       Specify localization for fake data. Defaults
                                       to en_US.
       --seed INTEGER
@@ -76,15 +76,15 @@ Command help
       Generate fake data and put it to Elasticsearch
 
     Options:
-      --index NAME           Name of an index to create. Defaults to test_index.
+      --index NAME           Name of an index to create. Defaults to 'test_index'.
       --mapping PATH         Path to a mapping file.
       --template PATH        Path to a faker template file.
-      -n, --num-doc INTEGER  Number of generating docs. Using bulk API if the
-                             value equals or greater than two. Defaults to 500.
-      --bulk-size INTEGER    Number of docs for a single bulk API call. Defaults
-                             to 200.
+      -n, --num-doc INTEGER  Number of generating documents. Using bulk API if the
+                             value equals or greater than two. Defaults to 1000.
+      --bulk-size INTEGER    Number of creating documents for a single bulk API
+                             call. Defaults to 200.
       --delete-index         Delete the index if already exists before generating
-                             docs.
+                             documents.
       -j, --jobs INTEGER     Number of jobs. Defaults to 1.
       --stdin                Read a faker template from stdin.
       --dry-run              Do no harm.
