@@ -105,7 +105,7 @@ def version(ctx):
     "index_name",
     metavar="NAME",
     default=Default.INDEX,
-    help="Name of an index to create. Defaults to {}.".format(Default.INDEX),
+    help="Name of an index to create. Defaults to '{}'.".format(Default.INDEX),
 )
 @click.option("--mapping", "mapping_filepath", type=click.Path(), help="Path to a mapping file.")
 @click.option(
@@ -118,7 +118,7 @@ def version(ctx):
     type=int,
     default=Default.NUM_DOC,
     help="""
-        Number of generating docs. Using bulk API if the value equals or greater than two.
+        Number of generating documents. Using bulk API if the value equals or greater than two.
         Defaults to {}.
     """.format(
         Default.NUM_DOC
@@ -128,12 +128,14 @@ def version(ctx):
     "--bulk-size",
     type=int,
     default=Default.BULK_SIZE,
-    help="Number of docs for a single bulk API call. Defaults to {}.".format(Default.BULK_SIZE),
+    help="Number of creating documents for a single bulk API call. Defaults to {}.".format(
+        Default.BULK_SIZE
+    ),
 )
 @click.option(
     "--delete-index",
     is_flag=True,
-    help="Delete the index if already exists before generating docs.",
+    help="Delete the index if already exists before generating documents.",
 )
 @click.option(
     "-j",
