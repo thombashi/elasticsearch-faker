@@ -141,7 +141,7 @@ def version(ctx):
     "num_worker",
     type=int,
     default=1,
-    help="Number of jobs. Defaults to {}.".format(1),
+    help="Number of jobs. Defaults to {}.".format(Default.NUM_WORKER),
 )
 @click.option("--stdin", "use_stdin", is_flag=True, help="Read a faker template from stdin.")
 @click.option("--dry-run", is_flag=True, help="Do no harm.")

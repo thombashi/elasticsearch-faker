@@ -28,4 +28,5 @@ class Default:
     BULK_SIZE = 200
     INDEX = "test_index"
     NUM_DOC = 1000
+    NUM_WORKER = 1
     TIMEOUT = 300
