@@ -19,6 +19,10 @@ Summary
     :target: https://github.com/thombashi/elasticsearch-faker/actions/workflows/build_and_release.yml
     :alt: Build and release CI status
 
+.. image:: https://github.com/thombashi/elasticsearch-faker/actions/workflows/codeql-analysis.yml/badge.svg
+    :target: https://github.com/thombashi/elasticsearch-faker/actions/workflows/codeql-analysis.yml
+    :alt: CodeQL
+
 
 Installation
 ============================================
