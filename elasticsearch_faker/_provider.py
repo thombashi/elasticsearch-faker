@@ -32,7 +32,7 @@ def _get_valid_providers(locale: str) -> Sequence[str]:
     )
 
 
-_provider_cache = {}  # type: Dict[str, AbstractSet]
+_provider_cache: Dict[str, AbstractSet] = {}
 _valid_locals = (
     "ar_EG",
     "ar_PS",
@@ -87,7 +87,7 @@ def check_providers(locale: str, providers: Sequence[str]) -> None:
 
     diffs = set(providers) - get_providers(locale)
     if diffs:
-        logger.error("invalid providers found: {}".format(diffs))
+        logger.error(f"invalid providers found: {diffs}")
 
         for invalid_provider in diffs:
             similar_providers = find_similar_providers(locale, invalid_provider)

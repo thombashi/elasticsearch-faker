@@ -18,6 +18,6 @@ def check_template(locale: str, template_text: str) -> None:
         sys.exit(errno.EINVAL)
 
     providers = re_provider.findall(template_text)
-    logger.debug("found providers in the template: {}".format(providers))
+    logger.debug(f"found providers in the template: {providers}")
 
     check_providers(locale, providers)

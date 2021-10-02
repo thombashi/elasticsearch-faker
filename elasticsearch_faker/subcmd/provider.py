@@ -66,7 +66,7 @@ def example(ctx, providers: List[str]):
             value = getattr(fake, provider)()
         except AttributeError:
             # implemented providers may differ locale to locale
-            logger.debug("provider not found: locale={}, provider={}".format(locale, provider))
+            logger.debug(f"provider not found: locale={locale}, provider={provider}")
             continue
 
-        click.echo("{}: {}".format(provider, str(value)[:limit]))
+        click.echo(f"{provider}: {str(value)[:limit]}")

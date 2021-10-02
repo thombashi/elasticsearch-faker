@@ -44,24 +44,24 @@ class ElasticsearchClientInterface(metaclass=abc.ABCMeta):
 
 class NullElasticsearchClient(ElasticsearchClientInterface):
     def create_index(self, index_name: str, mapping_filepath: str) -> None:
-        logger.debug("create index: {}".format(index_name))
+        logger.debug(f"create index: {index_name}")
 
     def delete_index(self, index_name: str) -> None:
-        logger.debug("delete index: {}".format(index_name))
+        logger.debug(f"delete index: {index_name}")
 
     def put(self, index_name: str, doc: Dict) -> int:
-        logger.debug("put a doc to {}".format(index_name))
+        logger.debug(f"put a doc to {index_name}")
         print(json.dumps(doc, indent=4))
         return 0
 
     def bulk_put(self, index_name: str, docs: List[Dict]) -> int:
         num_docs = len(docs) // 2
-        logger.debug("put {} docs to {}".format(num_docs, index_name))
+        logger.debug(f"put {num_docs} docs to {index_name}")
         print(json.dumps(docs, indent=4))
         return num_docs
 
     def refresh(self, index_name: str) -> None:
-        logger.debug("refresh {}".format(index_name))
+        logger.debug(f"refresh {index_name}")
 
     def count_docs(self, index_name: str) -> int:
         return 0
@@ -75,10 +75,10 @@ class ElasticsearchClient(ElasticsearchClientInterface):
         self.__es = es
 
     def create_index(self, index_name: str, mapping_filepath: str) -> None:
-        logger.debug("create index: {}".format(index_name))
+        logger.debug(f"create index: {index_name}")
 
         if not os.path.exists(mapping_filepath):
-            logger.error("mapping file not found: {}".format(mapping_filepath))
+            logger.error(f"mapping file not found: {mapping_filepath}")
             sys.exit(errno.ENOENT)
 
         with open(mapping_filepath) as f:
@@ -95,7 +95,7 @@ class ElasticsearchClient(ElasticsearchClientInterface):
                 raise
 
     def delete_index(self, index_name: str) -> None:
-        logger.debug("delete index: {}".format(index_name))
+        logger.debug(f"delete index: {index_name}")
         self.__es.indices.delete(index=index_name, ignore=404, request_timeout=Default.TIMEOUT)
 
     def put(self, index_name: str, doc: Dict) -> int:
@@ -133,16 +133,16 @@ class ElasticsearchClient(ElasticsearchClientInterface):
         logger.debug(json.dumps(docs[:2], indent=4, ensure_ascii=False))
 
         put_count = len(docs) // 2
-        logger.debug("successed to bulk put {} docs".format(put_count))
+        logger.debug(f"successed to bulk put {put_count} docs")
 
         return put_count
 
     def flush(self, index_name: str) -> None:
-        logger.debug("flush {}".format(index_name))
+        logger.debug(f"flush {index_name}")
         self.__es.indices.flush(index=index_name, request_timeout=Default.TIMEOUT)
 
     def refresh(self, index_name: str) -> None:
-        logger.debug("refresh {}".format(index_name))
+        logger.debug(f"refresh {index_name}")
         self.__es.indices.refresh(index=index_name, request_timeout=Default.TIMEOUT)
 
     def count_docs(self, index_name: str) -> int:

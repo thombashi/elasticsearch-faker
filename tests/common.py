@@ -1,9 +1,9 @@
 def print_result(stdout, stderr, expected=None):
     if expected:
-        print("[expected]\n{}".format(expected))
+        print(f"[expected]\n{expected}")
 
     if stdout:
-        print("[stdout]\n{}".format(stdout))
+        print(f"[stdout]\n{stdout}")
 
     if stderr:
-        print("[stderr]\n{}".format(stderr))
+        print(f"[stderr]\n{stderr}")

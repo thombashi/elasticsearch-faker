@@ -32,7 +32,7 @@ def _read_template_text(template_filepath: str, use_stdin: bool) -> str:
 
         template_text = sys.stdin.read()
     elif template_filepath:
-        logger.debug("load from a template file: {}".format(template_filepath))
+        logger.debug(f"load from a template file: {template_filepath}")
 
         with open(template_filepath) as f:
             template_text = f.read()
@@ -105,7 +105,7 @@ def version(ctx):
     "index_name",
     metavar="NAME",
     default=Default.INDEX,
-    help="Name of an index to create. Defaults to '{}'.".format(Default.INDEX),
+    help=f"Name of an index to create. Defaults to '{Default.INDEX}'.",
 )
 @click.option("--mapping", "mapping_filepath", type=click.Path(), help="Path to a mapping file.")
 @click.option(
@@ -143,7 +143,7 @@ def version(ctx):
     "num_worker",
     type=int,
     default=1,
-    help="Number of jobs. Defaults to {}.".format(Default.NUM_WORKER),
+    help=f"Number of jobs. Defaults to {Default.NUM_WORKER}.",
 )
 @click.option("--stdin", "use_stdin", is_flag=True, help="Read a faker template from stdin.")
 @click.option("--dry-run", is_flag=True, help="Do no harm.")
@@ -211,7 +211,7 @@ def generate(
             num_doc=num_doc,
             bulk_size=bulk_size,
         )
-        logger.info("generate {} docs to {}".format(gen_doc_count, index_name))
+        logger.info(f"generate {gen_doc_count} docs to {index_name}")
     else:
         with futures.ProcessPoolExecutor(num_worker) as executor:
             future_list = []
@@ -260,17 +260,17 @@ def generate(
         "\n".join(
             [
                 "\n[Results]",
-                "target index: {}".format(index_name),
-                "completed in {:,.1f} secs".format(elapse_secs),
-                "current store.size: {:,.1f} MB".format(current_store_size),
-                "current docs.count: {:,}".format(current_docs_count),
+                f"target index: {index_name}",
+                f"completed in {elapse_secs:,.1f} secs",
+                f"current store.size: {current_store_size:,.1f} MB",
+                f"current docs.count: {current_docs_count:,}",
                 "generated store.size: {:,.1f} MB".format(
                     current_store_size
                     - to_readable_size(primaries_stats_before["store"]["size_in_bytes"])
                 ),
-                "generated docs.count: {:,}".format(diff_docs_count),
-                "generated docs/secs: {:,.1f}".format(diff_docs_count / elapse_secs),
-                "bulk size: {:,}".format(bulk_size),
+                f"generated docs.count: {diff_docs_count:,}",
+                f"generated docs/secs: {diff_docs_count / elapse_secs:,.1f}",
+                f"bulk size: {bulk_size:,}",
             ]
         )
     )
@@ -289,7 +289,7 @@ def gen_doc_worker(
     gen_doc_count = 0
 
     with tqdm(
-        desc="document generator #{}".format(worker_id),
+        desc=f"document generator #{worker_id}",
         total=num_doc,
         unit="docs",
         # position=worker_id + 1,  # currently not using position to avoid display corruption
@@ -325,7 +325,7 @@ def validate(ctx, template_filepath: str):
     with open(template_filepath) as f:
         check_template(locale, f.read())
 
-    click.echo("Schema file at {} is valid.".format(template_filepath))
+    click.echo(f"Schema file at {template_filepath} is valid.")
 
 
 @cmd.command(epilog=COMMAND_EPILOG)
@@ -336,7 +336,7 @@ def validate(ctx, template_filepath: str):
     "index_name",
     metavar="NAME",
     default=Default.INDEX,
-    help="Path to a faker template file. Defaults to {}.".format(Default.INDEX),
+    help=f"Path to a faker template file. Defaults to {Default.INDEX}.",
 )
 def show_stats(ctx, host: str, index_name: str):
     es_client = create_es_client(host, dry_run=False)

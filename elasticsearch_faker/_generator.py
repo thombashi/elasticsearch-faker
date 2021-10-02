@@ -35,7 +35,7 @@ class FakeDocGenerator:
                 {
                     "index": {
                         "_index": self.__index_name,
-                        "_id": "{}-{}".format(self.__id_fake.uuid4(), worker_id),
+                        "_id": f"{self.__id_fake.uuid4()}-{worker_id}",
                     }
                 }
             )
@@ -51,7 +51,7 @@ class FakeDocGenerator:
                 value = getattr(self.__fake, provider)()
             except AttributeError:
                 # implemented providers may differ locale to locale
-                logger.debug("provider not found: provider={}".format(provider))
+                logger.debug(f"provider not found: provider={provider}")
                 continue
 
             data.append(self.__postprocess(provider, value))
