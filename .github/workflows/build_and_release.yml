@@ -10,19 +10,18 @@ concurrency:
   group: ci-${{ github.workflow }}
   cancel-in-progress: true
 
+env:
+  BIN_NAME: elasticsearch-faker
+  DIST_DIR_NAME: dist
+
 jobs:
-  build:
+  build-and-release:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         python-version: [3.8]
         os: [ubuntu-18.04, ubuntu-20.04]
     timeout-minutes: 20
-    env:
-      BIN_NAME: elasticsearch-faker
-      SHA_DIR: sha
-      SHA_TEXT_FILE: elasticsearch-faker_sha256.txt
-      DIST_DIR_NAME: dist
 
     steps:
       - uses: actions/checkout@v2
@@ -61,20 +60,9 @@ jobs:
 
           echo "::set-output name=dist_linux_files::$(find ${DIST_DIR_NAME}/${BIN_NAME}-*)"
 
-      - name: Calculate checksum
-        id: calc_checksum
-        run: |
-          set -x
-
-          mkdir -p "$SHA_DIR"
-          cd "$DIST_DIR_NAME"
-          sha256sum ${{ steps.build_deb_package.outputs.dist_linux_files }} > "../${SHA_DIR}/${SHA_TEXT_FILE}"
-
-          echo "::set-output name=checksum_file::$SHA_TEXT_FILE"
-
       - uses: actions/upload-artifact@v2
         with:
-          name: binaries-${{ matrix.os }}
+          name: binaries
           path: ${{ env.DIST_DIR_NAME }}/${{ env.BIN_NAME }}_*
           if-no-files-found: error
           retention-days: 1
@@ -82,9 +70,50 @@ jobs:
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
             ${{ steps.build_deb_package.outputs.dist_linux_files }}
             ${{ steps.build_deb_package.outputs.checksum_file }}
+
+  calc-hash:
+    needs: [build-and-release]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SHA_DIR: sha
+      SHA_TEXT_FILE: elasticsearch-faker_sha256.txt
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: binaries
+          path: ${{ env.DIST_DIR_NAME }}
+
+      - name: Calculate checksums of binary packages
+        id: calc_checksum
+        run: |
+          set -x
+
+          mkdir -p "$SHA_DIR"
+          cd "$DIST_DIR_NAME"
+          sha256sum ${BIN_NAME}_* > "../${SHA_DIR}/${SHA_TEXT_FILE}"
+
+          echo "::set-output name=filename::${SHA_DIR}/${SHA_TEXT_FILE}"
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: shasum
+          path: ${{ env.SHA_DIR }}
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            ${{ steps.calc_checksum.outputs.filename }}
