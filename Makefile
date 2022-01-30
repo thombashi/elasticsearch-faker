@@ -1,4 +1,5 @@
 PYTHON := python3
+SUDO := sudo
 
 
 .PHONY: build
@@ -22,6 +23,11 @@ fmt:
 release:
 	@$(PYTHON) setup.py release --sign --search-dir elasticsearch_faker
 	@make clean
+
+.PHONY: setup-deb-build
+setup-deb-build:
+	@$(SUDO) apt -qq update
+	@$(SUDO) apt install -qq -y --no-install-recommends git fakeroot rename
 
 .PHONY: setup-ci
 setup-ci:
