@@ -3,6 +3,7 @@ from typing import List
 
 import click
 from faker import Factory, Faker
+from faker.exceptions import UnsupportedFeature
 
 from .._const import COMMAND_EPILOG, Context
 from .._logger import logger
@@ -67,6 +68,9 @@ def example(ctx, providers: List[str]):
         except AttributeError:
             # implemented providers may differ locale to locale
             logger.debug(f"provider not found: locale={locale}, provider={provider}")
+            continue
+        except UnsupportedFeature as e:
+            logger.warning(f"provider={provider}: {e}")
             continue
 
         click.echo(f"{provider}: {str(value)[:limit]}")
