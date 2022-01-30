@@ -65,6 +65,7 @@ jobs:
           echo "::set-output name=dist_filepath_amd64::$(find dist/elasticsearch-faker-*_*.*.*_amd64.deb)"
 
       - name: Release
+        if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           files: |
