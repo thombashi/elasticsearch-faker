@@ -104,7 +104,7 @@ def version(ctx):
 
 @cmd.command(epilog=COMMAND_EPILOG)
 @click.pass_context
-@click.argument("host", type=str)
+@click.argument("endpoint", type=str)
 @click.option(
     "--index",
     "index_name",
@@ -154,7 +154,7 @@ def version(ctx):
 @click.option("--dry-run", is_flag=True, help="Do no harm.")
 def generate(
     ctx,
-    host: str,
+    endpoint: str,
     index_name: str,
     mapping_filepath: str,
     template_filepath: str,
@@ -174,8 +174,8 @@ def generate(
     start_time = time.time()
 
     logger.debug(
-        "host={}, index_name={}, template_filepath={}, num_doc={}, bulk_size={}".format(
-            host, index_name, template_filepath, num_doc, bulk_size
+        "endpoint={}, index_name={}, template_filepath={}, num_doc={}, bulk_size={}".format(
+            endpoint, index_name, template_filepath, num_doc, bulk_size
         )
     )
 
@@ -188,7 +188,7 @@ def generate(
     if seed is not None:
         Faker.seed(seed)
 
-    es_client = create_es_client(host, dry_run)
+    es_client = create_es_client(endpoint, dry_run)
 
     if delete_index:
         es_client.delete_index(index_name)
@@ -209,7 +209,7 @@ def generate(
 
     if num_worker == 1:
         _, gen_doc_count = gen_doc_worker(
-            host=host,
+            endpoint=endpoint,
             dry_run=dry_run,
             doc_generator=doc_generator,
             index_name=index_name,
@@ -232,7 +232,7 @@ def generate(
                 future_list.append(
                     executor.submit(
                         gen_doc_worker,
-                        host,
+                        endpoint,
                         dry_run,
                         doc_generator,
                         index_name,
@@ -282,7 +282,7 @@ def generate(
 
 
 def gen_doc_worker(
-    host: str,
+    endpoint: str,
     dry_run: bool,
     doc_generator: FakeDocGenerator,
     index_name: str,
@@ -290,7 +290,7 @@ def gen_doc_worker(
     bulk_size: int,
     worker_id: int = 0,
 ) -> Tuple[int, int]:
-    es_client = create_es_client(host, dry_run)
+    es_client = create_es_client(endpoint, dry_run)
     gen_doc_count = 0
 
     with tqdm(
@@ -335,7 +335,7 @@ def validate(ctx, template_filepath: str):
 
 @cmd.command(epilog=COMMAND_EPILOG)
 @click.pass_context
-@click.argument("host", type=str)
+@click.argument("endpoint", type=str)
 @click.option(
     "--index",
     "index_name",
@@ -343,8 +343,8 @@ def validate(ctx, template_filepath: str):
     default=Default.INDEX,
     help=f"Path to a faker template file. Defaults to {Default.INDEX}.",
 )
-def show_stats(ctx, host: str, index_name: str):
-    es_client = create_es_client(host, dry_run=False)
+def show_stats(ctx, endpoint: str, index_name: str):
+    es_client = create_es_client(endpoint, dry_run=False)
     stats = es_client.fetch_stats(index_name)
 
     try:

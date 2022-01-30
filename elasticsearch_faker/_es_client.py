@@ -160,12 +160,12 @@ class ElasticsearchClient(ElasticsearchClientInterface):
         return stats["indices"][index_name]
 
 
-def create_es_client(host: str, dry_run: bool) -> ElasticsearchClientInterface:
+def create_es_client(endpoint: str, dry_run: bool) -> ElasticsearchClientInterface:
     if dry_run:
         return NullElasticsearchClient()
 
     try:
-        es = Elasticsearch(hosts=[host], sniff_on_start=False)
+        es = Elasticsearch(hosts=[endpoint], sniff_on_start=False)
     except TransportError as e:
         logger.error(e)
         sys.exit(errno.ENETUNREACH)
