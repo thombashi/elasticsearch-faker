@@ -47,6 +47,7 @@ jobs:
 
   unit-test:
     runs-on: ${{ matrix.os }}
+    permissions: read-all
     strategy:
       fail-fast: false
       matrix:
