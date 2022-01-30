@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import errno
+import os
 import sys
 import time
 from concurrent import futures
@@ -32,6 +33,10 @@ def _read_template_text(template_filepath: str, use_stdin: bool) -> str:
 
         template_text = sys.stdin.read()
     elif template_filepath:
+        if not os.path.exists(template_filepath):
+            logger.error(f"no such file: {template_filepath}")
+            sys.exit(errno.ENOENT)
+
         logger.debug(f"load from a template file: {template_filepath}")
 
         with open(template_filepath) as f:
