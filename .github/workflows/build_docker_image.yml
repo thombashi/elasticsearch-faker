@@ -29,8 +29,27 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Docker image
-        run: make docker-build
         working-directory: docker
+        run: |
+          # wait for PyPI to be reflected the package release
+          sleep 30
+
+          # build with retries
+          MAX_ATTEMPT=30
+          BASE_SLEEP=1
+          CMD="make docker-build"
+
+          $CMD && exit 0
+
+          for attempt_num in $(seq $MAX_ATTEMPT); do
+              SLEEP=$(echo "$BASE_SLEEP * $attempt_num" | bc)
+              echo "'$CMD' failed. retrying in $SLEEP seconds..." 1>&2
+              sleep $SLEEP
+
+              $CMD && break
+          done
+
+          make docker-build
 
       - name: Push Docker image
         if: startsWith(github.ref, 'refs/tags/')
