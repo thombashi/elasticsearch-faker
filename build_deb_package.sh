@@ -2,45 +2,61 @@
 
 set -eux
 
+TOPLEVEL_DIR=$(git rev-parse --show-toplevel)
+DPKG_BUILD_DIR="dpkg_build"
 DIST_DIR_NAME="dist"
-INSTALL_DIR_PATH="/usr/bin"
-DIST_DIR_PATH="./${DIST_DIR_NAME}/${INSTALL_DIR_PATH}"
+INSTALL_DIR_PATH="/usr/local/bin"
+BUILD_DIR_PATH="${TOPLEVEL_DIR}/${DPKG_BUILD_DIR}/${INSTALL_DIR_PATH}"
 PKG_NAME="elasticsearch-faker"
 PKG_NAME_SNAKE="elasticsearch_faker"
 PYTHON=python3
+MACHINE=$($PYTHON -c "import platform; machine=platform.machine().casefold(); print('amd64' if machine == 'x86_64' else machine)")
+
+cd "$TOPLEVEL_DIR"
 
 # initialize
-rm -rf $DIST_DIR_NAME
-mkdir -p "${DIST_DIR_NAME}/DEBIAN"
+rm -rf "$DIST_DIR_NAME" "$DPKG_BUILD_DIR" build
+mkdir -p "${DPKG_BUILD_DIR}/DEBIAN" "$DIST_DIR_NAME"
 
 $PYTHON -m pip install --upgrade -q "pip>=21.1"
-$PYTHON -m pip install --upgrade -q .[buildexe] distro
+$PYTHON -m pip install --upgrade -q .[buildexe]
 
 PKG_VERSION=$($PYTHON -c "import ${PKG_NAME_SNAKE}; print(${PKG_NAME_SNAKE}.__version__)")
-CODENAME=$($PYTHON -m distro --json | jq --raw-output .codename)
 
 if [ "$PKG_VERSION" = "" ]; then
     echo 'failed to get the package version' 1>&2
     exit 1
 fi
 
-echo "$CODENAME $PKG_NAME $PKG_VERSION"
+echo "$PKG_NAME $PKG_VERSION"
 
 
 # build an executable binary file
-pyinstaller cli.py --clean --onefile --distpath "$DIST_DIR_PATH" --name "$PKG_NAME"
-
-${DIST_DIR_PATH}/${PKG_NAME} --version
+pyinstaller cli.py --clean --onefile --distpath "$BUILD_DIR_PATH" --name "$PKG_NAME"
+${BUILD_DIR_PATH}/${PKG_NAME} --version
 
 # build a deb package
-cat <<_CONTROL_ >"${DIST_DIR_NAME}/DEBIAN/control"
-Package: ${PKG_NAME}-${CODENAME}
+cat << _CONTROL_ > "${DPKG_BUILD_DIR}/DEBIAN/control"
+Package: $PKG_NAME
 Version: $PKG_VERSION
 Maintainer: Tsuyoshi Hombashi <tsuyoshi.hombashi@gmail.com>
-Architecture: amd64
-Description: elasticsearch-faker is a CLI tool to generate fake data for Elasticsearch.
+Architecture: $MACHINE
+Description: $PKG_NAME is a CLI tool to generate fake data for Elasticsearch.
 Homepage: https://github.com/thombashi/$PKG_NAME
 Priority: extra
 _CONTROL_
+cat "${DPKG_BUILD_DIR}/DEBIAN/control" 2>&1
 
-fakeroot dpkg-deb --build $DIST_DIR_NAME $DIST_DIR_NAME
+VERSION_CODENAME=$(\grep -Po "(?<=VERSION_CODENAME=)[a-z]+" /etc/os-release)
+
+fakeroot dpkg-deb --build "$DPKG_BUILD_DIR" "$DIST_DIR_NAME"
+rename -v "s/_${MACHINE}.deb/_${VERSION_CODENAME}_${MACHINE}.deb/" ${DIST_DIR_NAME}/*
+
+# generate an archive file
+ARCHIVE_EXTENSION=tar.gz
+SYSTEM=$($PYTHON -c "import platform; print(platform.system().casefold())")
+ARCHIVE_FILE="${PKG_NAME}_${PKG_VERSION}_${SYSTEM}_${VERSION_CODENAME}_${MACHINE}.${ARCHIVE_EXTENSION}"
+
+cd "$BUILD_DIR_PATH"
+tar -zcvf "$ARCHIVE_FILE" "$PKG_NAME"
+mv "$ARCHIVE_FILE" "${TOPLEVEL_DIR}/${DIST_DIR_NAME}/"
