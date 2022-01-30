@@ -18,6 +18,10 @@ jobs:
         python-version: [3.8]
         os: [ubuntu-18.04, ubuntu-20.04]
     timeout-minutes: 20
+    env:
+      SHA_DIR: sha
+      SHA_TEXT_FILE: elasticsearch-faker_sha256.txt
+      DIST_DIR_NAME: dist
 
     steps:
       - uses: actions/checkout@v2
@@ -28,7 +32,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Install pip
-        run: python -m pip install --upgrade --disable-pip-version-check "pip>=21.1" distro
+        run: python -m pip install --upgrade --disable-pip-version-check "pip>=21.1"
 
       - name: Get pip cache dir
         id: pip-cache
@@ -52,24 +56,26 @@ jobs:
         id: build_deb_package
         run: |
           ./build_deb_package.sh
-          codename=$(python -m distro --json | jq --raw-output .codename)
-          checksum_filename=sha256sum_${codename}_amd64.txt
 
-          echo "codename=${codename}"
+          echo "::set-output name=dist_linux_files::$(find ${DIST_DIR_NAME}/elasticsearch-faker-*)"
 
-          sha256sum ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }} > "$checksum_filename"
+      - name: Calculate checksum
+        id: calc_checksum
+        run: |
+          set -x
 
-          echo "::debug::checksum=$checksum_filename"
+          mkdir -p "$SHA_DIR"
+          cd "$DIST_DIR_NAME"
+          sha256sum ${{ steps.build_deb_package.outputs.dist_linux_files }} > "../${SHA_DIR}/${SHA_TEXT_FILE}"
 
-          echo "::set-output name=checksum_file::$checksum_filename"
-          echo "::set-output name=dist_filepath_amd64::$(find dist/elasticsearch-faker-*_*.*.*_amd64.deb)"
+          echo "::set-output name=checksum_file::$SHA_TEXT_FILE"
 
       - name: Release
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ${{ steps.build_deb_package.outputs.dist_filepath_amd64 }}
+            ${{ steps.build_deb_package.outputs.dist_linux_files }}
             ${{ steps.build_deb_package.outputs.checksum_file }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
