@@ -58,7 +58,7 @@ jobs:
           make setup-deb-build
           ./build_deb_package.sh
 
-          echo "::set-output name=dist_linux_files::$(find ${DIST_DIR_NAME}/${BIN_NAME}-*)"
+          echo "::set-output name=dist_linux_files::$(find ${DIST_DIR_NAME}/${BIN_NAME}_*)"
 
       - uses: actions/upload-artifact@v2
         with:
@@ -75,7 +75,6 @@ jobs:
         with:
           files: |
             ${{ steps.build_deb_package.outputs.dist_linux_files }}
-            ${{ steps.build_deb_package.outputs.checksum_file }}
 
   calc-hash:
     needs: [build-and-release]
