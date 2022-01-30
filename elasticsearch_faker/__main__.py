@@ -78,7 +78,7 @@ def to_readable_size(size_in_bytes: int) -> float:
 @click.pass_context
 def cmd(ctx, log_level: str, verbosity_level: int, locale: str, seed: int):
     """
-    Faker for Elasticsearch
+    Faker for Elasticsearch.
     """
 
     ctx.obj[Context.LOG_LEVEL] = LogLevel.INFO if log_level is None else log_level
@@ -94,7 +94,7 @@ def cmd(ctx, log_level: str, verbosity_level: int, locale: str, seed: int):
 @click.pass_context
 def version(ctx):
     """
-    Show version information
+    Show version information.
     """
 
     import envinfopy
@@ -174,7 +174,7 @@ def generate(
     dry_run: bool,
 ):
     """
-    Generate fake data and put it to Elasticsearch
+    Generate fake data and put it to an Elasticsearch index.
     """
 
     locale = ctx.obj[Context.LOCALE]
