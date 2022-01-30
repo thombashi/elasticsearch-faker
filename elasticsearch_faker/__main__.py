@@ -50,7 +50,7 @@ def _read_template_text(template_filepath: str, use_stdin: bool) -> str:
 
 
 def to_readable_size(size_in_bytes: int) -> float:
-    return size_in_bytes / 1024 ** 2
+    return size_in_bytes / 1024**2
 
 
 @click.group(context_settings=CONTEXT_SETTINGS, epilog=COMMAND_EPILOG)
