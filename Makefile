@@ -1,9 +1,25 @@
 PYTHON := python3
 SUDO := sudo
 
+OWNER := thombashi
+REPO := elasticsearch-faker
+
+BUILD_WORK_DIR := _work
+PKG_BUILD_DIR := $(BUILD_WORK_DIR)/$(REPO)
+
+
+.PHONY: build-remote
+build-remote: clean
+	@mkdir -p $(BUILD_WORK_DIR)
+	@cd $(BUILD_WORK_DIR) && \
+		git clone https://github.com/$(OWNER)/$(REPO).git --depth 1 && \
+		cd $(REPO) && \
+		$(PYTHON) -m tox -e build
+	ls -lh $(PKG_BUILD_DIR)/dist/*
 
 .PHONY: build
 build: clean
+	@rm -rf $(BUILD_WORK_DIR)
 	@$(PYTHON) -m tox -e build
 	ls -lh dist/*
 
@@ -21,7 +37,7 @@ fmt:
 
 .PHONY: release
 release:
-	@$(PYTHON) setup.py release --sign --search-dir elasticsearch_faker
+	@cd $(PKG_BUILD_DIR) && $(PYTHON) setup.py release --sign --search-dir elasticsearch_faker
 	@make clean
 
 .PHONY: setup-deb-build
