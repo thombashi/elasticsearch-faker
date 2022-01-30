@@ -77,12 +77,14 @@ class ElasticsearchClient(ElasticsearchClientInterface):
     def create_index(self, index_name: str, mapping_filepath: str) -> None:
         logger.debug(f"create index: {index_name}")
 
-        if not os.path.exists(mapping_filepath):
-            logger.error(f"mapping file not found: {mapping_filepath}")
-            sys.exit(errno.ENOENT)
+        mappings = {}
+        if mapping_filepath:
+            if not os.path.exists(mapping_filepath):
+                logger.error(f"mapping file not found: {mapping_filepath}")
+                sys.exit(errno.ENOENT)
 
-        with open(mapping_filepath) as f:
-            mappings = json.load(f)
+            with open(mapping_filepath) as f:
+                mappings = json.load(f)
 
         try:
             result = self.__es.indices.create(index=index_name, body=mappings)
