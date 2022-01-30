@@ -49,8 +49,6 @@ jobs:
               $CMD && break
           done
 
-          make docker-build
-
       - name: Push Docker image
         if: startsWith(github.ref, 'refs/tags/')
         run: make docker-push
