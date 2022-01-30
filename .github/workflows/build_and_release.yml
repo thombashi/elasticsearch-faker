@@ -75,7 +75,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            ${{ steps.build_deb_package.outputs.dist_linux_files }}
+            ${DIST_DIR_NAME}/${BIN_NAME}_*
 
   calc-hash:
     needs: [build-and-release]
