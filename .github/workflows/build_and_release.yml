@@ -67,7 +67,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      - name: Release
+      - name: Release binary packages
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         env:
@@ -108,7 +108,7 @@ jobs:
           if-no-files-found: error
           retention-days: 1
 
-      - name: Release
+      - name: Release checksum
         if: startsWith(github.ref, 'refs/tags/')
         uses: softprops/action-gh-release@v1
         env:
