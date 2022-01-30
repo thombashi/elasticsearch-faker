@@ -9,7 +9,7 @@ RUN set -eux \
     && apt-get install -qq --no-install-recommends \
         python3 \
         python3-pip \
-    && python3 -m pip install "elasticsearch-faker==${version}" \
+    && python3 -m pip install --retries 30 "elasticsearch-faker==${version}" --disable-pip-version-check \
     && rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT ["elasticsearch-faker"]
