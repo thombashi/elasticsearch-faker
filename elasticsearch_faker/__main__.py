@@ -112,7 +112,15 @@ def version(ctx):
     default=Default.INDEX,
     help=f"Name of an index to create. Defaults to '{Default.INDEX}'.",
 )
-@click.option("--mapping", "mapping_filepath", type=click.Path(), help="Path to a mapping file.")
+@click.option(
+    "--mapping",
+    "mapping_filepath",
+    type=click.Path(),
+    help="""
+    Path to a mapping file. See also
+    https://www.elastic.co/guide/en/elasticsearch/reference/current/explicit-mapping.html
+    """,  # noqa
+)
 @click.option(
     "--template", "template_filepath", type=click.Path(), help="Path to a faker template file."
 )
@@ -341,9 +349,12 @@ def validate(ctx, template_filepath: str):
     "index_name",
     metavar="NAME",
     default=Default.INDEX,
-    help=f"Path to a faker template file. Defaults to {Default.INDEX}.",
+    help=f"Name of an index to show statistics. Defaults to '{Default.INDEX}'.",
 )
 def show_stats(ctx, endpoint: str, index_name: str):
+    """
+    Fetch and show statistics of an index.
+    """
     es_client = create_es_client(endpoint, dry_run=False)
     stats = es_client.fetch_stats(index_name)
 

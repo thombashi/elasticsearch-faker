@@ -12,7 +12,9 @@ from .._provider import get_providers
 
 @click.group(epilog=COMMAND_EPILOG)
 def provider():
-    pass
+    """
+    Show or search providers for template.
+    """
 
 
 @provider.command()
