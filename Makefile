@@ -19,7 +19,6 @@ build-remote: clean
 
 .PHONY: build
 build: clean
-	@rm -rf $(BUILD_WORK_DIR)
 	@$(PYTHON) -m tox -e build
 	ls -lh dist/*
 
@@ -29,6 +28,7 @@ check:
 
 .PHONY: clean
 clean:
+	@rm -rf $(BUILD_WORK_DIR)
 	@$(PYTHON) -m tox -e clean
 
 .PHONY: fmt
