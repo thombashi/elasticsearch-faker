@@ -128,6 +128,7 @@ cython_debug/
 
 # User settings
 _sandbox/
+dpkg_build/
 *_profile
 Untitled.ipynb
 
