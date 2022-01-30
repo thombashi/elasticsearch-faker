@@ -1,8 +1,50 @@
-name: Tests
+name: Lint and Test
 
 on: [push, pull_request]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions: read-all
+    env:
+      python-version: "3.8"
+    strategy:
+      fail-fast: false
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Python ${{ env.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ env.python-version }}
+
+      - name: Install pip
+        run: python -m pip install --upgrade --disable-pip-version-check "pip>=21.1"
+
+      - name: Get pip cache dir
+        id: pip-cache
+        run: echo "::set-output name=dir::$(pip cache dir)"
+
+      - name: Cache pip
+        uses: actions/cache@v2
+        with:
+          path: |
+            ${{ steps.pip-cache.outputs.dir }}
+            ./.tox
+          key: ubuntu-latest-${{ env.python-version }}-pip-${{ hashFiles('setup.py', '**/requirements.txt') }}
+          restore-keys: |
+            ubuntu-latest-${{ env.python-version }}-pip-
+
+      - name: Install dependencies
+        run: make setup-ci
+
+      - name: Lint
+        run: make check
+        env:
+          PYTEST_DISCORD_WEBHOOK: ${{ secrets.PYTEST_DISCORD_WEBHOOK }}
+
   unit-test:
     runs-on: ${{ matrix.os }}
     strategy:
