@@ -4,9 +4,28 @@ SUDO := sudo
 OWNER := thombashi
 REPO := elasticsearch-faker
 
+ACTIONLINT_VERSION := v1.6.8
+SHELLCHECK_VERSION := v0.7.2
+
 BUILD_WORK_DIR := _work
 PKG_BUILD_DIR := $(BUILD_WORK_DIR)/$(REPO)
 
+CACHE_VERSION := 0
+PKG_CACHE_ROOT_DIR := $(HOME)/.cache/downloaded
+PKG_CACHE_DIR := $(PKG_CACHE_ROOT_DIR)/$(CACHE_VERSION)
+SHELLCHECK_CACHE_DIR := $(PKG_CACHE_DIR)/shellcheck-$(SHELLCHECK_VERSION)
+
+
+$(SHELLCHECK_CACHE_DIR):
+	@echo "installing shellcheck $(SHELLCHECK_VERSION)"
+	@mkdir -p $(SHELLCHECK_CACHE_DIR)
+	@curl -sSLf https://github.com/koalaman/shellcheck/releases/download/${SHELLCHECK_VERSION}/shellcheck-${SHELLCHECK_VERSION}.linux.x86_64.tar.xz | tar -xJv -C $(SHELLCHECK_CACHE_DIR) --strip-components 1 --no-anchored shellcheck
+	@$(SUDO) mv $(SHELLCHECK_CACHE_DIR)/shellcheck /usr/local/bin/shellcheck
+	shellcheck --version
+
+.PHONY: actionlint
+actionlint: setup-actionlint
+	@actionlint -ignore=SC204 -ignore=SC2086 -ignore=SC2129
 
 .PHONY: build-remote
 build-remote: clean
@@ -40,16 +59,24 @@ release:
 	@cd $(PKG_BUILD_DIR) && $(PYTHON) setup.py release --sign --search-dir elasticsearch_faker
 	@make clean
 
-.PHONY: setup-deb-build
-setup-deb-build:
-	@$(SUDO) apt -qq update
-	@$(SUDO) apt install -qq -y --no-install-recommends git fakeroot rename
+.PHONY: setup-actionlint
+setup-actionlint:
+	@go install github.com/rhysd/actionlint/cmd/actionlint@${ACTIONLINT_VERSION}
+	actionlint --version
 
 .PHONY: setup-ci
 setup-ci:
 	@$(PYTHON) -m pip install -q --disable-pip-version-check --upgrade tox
 
+.PHONY: setup-deb-build
+setup-deb-build:
+	@$(SUDO) apt -qq update
+	@$(SUDO) apt install -qq -y --no-install-recommends git fakeroot rename
+
+.PHONY: setup-shellcheck
+setup-shellcheck: $(SHELLCHECK_CACHE_DIR)
+
 .PHONY: setup
-setup: setup-ci
+setup: setup-actionlint setup-ci setup-shellcheck
 	@$(PYTHON) -m pip install -q --disable-pip-version-check --upgrade -e .[test] releasecmd
 	@$(PYTHON) -m pip check
