@@ -57,7 +57,7 @@ fmt:
 .PHONY: release
 release:
 	@cd $(PKG_BUILD_DIR) && $(PYTHON) setup.py release --sign --search-dir elasticsearch_faker
-	@make clean
+	@$(MAKE) clean
 
 .PHONY: setup-actionlint
 setup-actionlint:
