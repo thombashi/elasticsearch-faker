@@ -35,6 +35,25 @@ jobs:
       - name: Login to GitHub Package Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login "$REGISTRY" -u ${{ github.actor }} --password-stdin
 
+      - name: Wait for PyPI to be reflected the package release
+        env:
+          ES_FAKER_VERSION: ${{ steps.extract-version.outputs.version }}
+        run: |
+          MAX_ATTEMPT=30
+          BASE_SLEEP=1
+          CMD="python3 -m pip install --retries 30 --disable-pip-version-check elasticsearch-faker==${ES_FAKER_VERSION}"
+
+          $CMD && exit 0
+          for attempt_num in $(seq $MAX_ATTEMPT); do
+              SLEEP=$(echo "$BASE_SLEEP * $attempt_num" | bc)
+              echo "'$CMD' failed. retrying in $SLEEP seconds..." 1>&2
+              sleep "$SLEEP"
+
+              $CMD && exit 0
+          done
+
+          exit 1
+
       - name: Build and push Docker images - es7
         working-directory: docker
         env:
