@@ -54,7 +54,7 @@ Installation: dpkg (Ubuntu)
 
 Installation: Docker container
 --------------------------------------------
-https://github.com/thombashi/elasticsearch-faker/pkgs/container/elasticsearch-faker
+`Packages page <https://github.com/thombashi/elasticsearch-faker/pkgs/container/elasticsearch-faker>`__
 
 
 Usage
