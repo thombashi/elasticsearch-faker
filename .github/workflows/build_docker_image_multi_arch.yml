@@ -40,7 +40,7 @@ jobs:
           ES_FAKER_VERSION: ${{ steps.extract-version.outputs.version }}
           EXTRAS: es7
         run: |
-          IMAGE_TAG=${REGISTRY}/${OWNER}/${REPO}:${ES_FAKER_VERSION}
+          IMAGE_TAG=${REGISTRY}/${OWNER}/${REPO}:${ES_FAKER_VERSION}-${EXTRAS}
 
           docker buildx build \
             -t "$IMAGE_TAG" \
