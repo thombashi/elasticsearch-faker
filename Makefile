@@ -10,6 +10,8 @@ SHELLCHECK_VERSION := v0.8.0
 BUILD_WORK_DIR := _work
 PKG_BUILD_DIR := $(BUILD_WORK_DIR)/$(REPO)
 
+SH_FILES := $(shell find ./ -type f -name \*.sh)
+
 CACHE_VERSION := 0
 PKG_CACHE_ROOT_DIR := $(HOME)/.cache/downloaded
 PKG_CACHE_DIR := $(PKG_CACHE_ROOT_DIR)/$(CACHE_VERSION)
@@ -44,6 +46,7 @@ build: clean
 .PHONY: check
 check:
 	@$(PYTHON) -m tox -e lint
+	shellcheck --severity=error ${SH_FILES}
 
 .PHONY: clean
 clean:
