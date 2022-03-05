@@ -1,5 +1,6 @@
 REGISTRY := ghcr.io
 OWNER := thombashi
+USER := thombashi
 REPO := elasticsearch-faker
 
 VERSION := $(shell ./extract_version.sh)
@@ -19,7 +20,7 @@ lint-dockerfile:
 
 .PHONY: docker-login
 docker-login: check-github-token
-	@echo $(GITHUB_TOKEN) | docker login $(REGISTRY) -u $(OWNER) --password-stdin
+	@echo $(GITHUB_TOKEN) | docker login $(REGISTRY) -u $(USER) --password-stdin
 
 .PHONY: docker-build
 docker-build:
