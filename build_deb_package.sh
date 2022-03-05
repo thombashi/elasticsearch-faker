@@ -2,6 +2,18 @@
 
 set -eux
 
+if [ $# != 1 ]; then
+  echo "Usage: $(basename $0) <ES extras>" 1>&2
+  exit 22
+fi
+
+ES_EXTRAS=$1
+
+if ! [[ $ES_EXTRAS =~ es[0-9]+ ]]; then
+  echo "[ERROR] extras must be es[0-9]+ format" 1>&2
+  exit 22
+fi
+
 TOPLEVEL_DIR=$(git rev-parse --show-toplevel)
 DPKG_BUILD_DIR="dpkg_build"
 DIST_DIR_NAME="dist"
@@ -15,11 +27,11 @@ ARCH=$(dpkg --print-architecture)
 cd "$TOPLEVEL_DIR"
 
 # initialize
-rm -rf "$DIST_DIR_NAME" "$DPKG_BUILD_DIR" build
+rm -rf "$DPKG_BUILD_DIR" build
 mkdir -p "${DPKG_BUILD_DIR}/DEBIAN" "$DIST_DIR_NAME"
 
 $PYTHON -m pip install --upgrade -q "pip>=21.1"
-$PYTHON -m pip install --upgrade -q .[buildexe]
+$PYTHON -m pip install --upgrade -q .[buildexe,${ES_EXTRAS}]
 
 PKG_VERSION=$($PYTHON -c "import ${PKG_NAME_SNAKE}; print(${PKG_NAME_SNAKE}.__version__)")
 
@@ -48,14 +60,15 @@ _CONTROL_
 cat "${DPKG_BUILD_DIR}/DEBIAN/control" 2>&1
 
 VERSION_CODENAME=$(\grep -Po "(?<=VERSION_CODENAME=)[a-z]+" /etc/os-release)
+FILE_SUFFIX="_${ES_EXTRAS}_${VERSION_CODENAME}_${ARCH}"
 
 fakeroot dpkg-deb --build "$DPKG_BUILD_DIR" "$DIST_DIR_NAME"
-rename -v "s/_${ARCH}.deb/_${VERSION_CODENAME}_${ARCH}.deb/" ${DIST_DIR_NAME}/*
+rename -v "s/_${ARCH}.deb/${FILE_SUFFIX}.deb/" ${DIST_DIR_NAME}/*
 
 # generate an archive file
 ARCHIVE_EXTENSION=tar.gz
 SYSTEM=$($PYTHON -c "import platform; print(platform.system().casefold())")
-ARCHIVE_FILE="${PKG_NAME}_${PKG_VERSION}_${SYSTEM}_${VERSION_CODENAME}_${ARCH}.${ARCHIVE_EXTENSION}"
+ARCHIVE_FILE="${PKG_NAME}_${PKG_VERSION}_${SYSTEM}${FILE_SUFFIX}.${ARCHIVE_EXTENSION}"
 
 cd "$BUILD_DIR_PATH"
 tar -zcvf "$ARCHIVE_FILE" "$PKG_NAME"

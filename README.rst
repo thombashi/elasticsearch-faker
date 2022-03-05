@@ -33,6 +33,18 @@ Installation: pip
 
     pip install elasticsearch-faker
 
+Installation: pip (for Elasticsearch 7)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+    pip install elasticsearch-faker[es7]
+
+Installation: pip (for Elasticsearch 8)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+::
+
+    pip install elasticsearch-faker[es8]
+
 Installation: dpkg (Ubuntu)
 --------------------------------------------
 

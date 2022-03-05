@@ -1,5 +1,5 @@
 click>=6.2,<9
-elasticsearch>=7.0.5,<8
+elasticsearch>=7.0.5,<9
 envinfopy>=0.0.3,<1
 Faker>=1.0.8,<14
 Jinja2>=2.8,<4

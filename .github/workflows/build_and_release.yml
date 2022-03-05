@@ -52,14 +52,18 @@ jobs:
         id: get_version
         uses: battila7/get-version-action@v2
 
-      - name: Build deb package
-        id: build_deb_package
+      - name: Setup build
+        run: make setup-deb-build
+
+      - name: Build deb package - es7
         run: |
-          make setup-deb-build
-          ./build_deb_package.sh
+          ./build_deb_package.sh es7
           ls -lh ${DIST_DIR_NAME}/*
 
-          echo "::set-output name=dist_linux_files::$(find ${DIST_DIR_NAME}/${BIN_NAME}_*)"
+      - name: Build deb package - es8
+        run: |
+          ./build_deb_package.sh es8
+          ls -lh ${DIST_DIR_NAME}/*
 
       - uses: actions/upload-artifact@v2
         with:

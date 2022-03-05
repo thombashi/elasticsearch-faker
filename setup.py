@@ -56,6 +56,8 @@ setuptools.setup(
     install_requires=INSTALL_REQUIRES,
     extras_require={
         "buildexe": build_exe_requires,
+        "es7": ["elasticsearch>=7.0.5,<8"],
+        "es8": ["elasticsearch>=8,<9"],
         "test": TESTS_REQUIRES,
     },
     classifiers=[
