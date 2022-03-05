@@ -46,8 +46,10 @@ jobs:
               echo "'$CMD' failed. retrying in $SLEEP seconds..." 1>&2
               sleep $SLEEP
 
-              $CMD && break
+              $CMD && exit 0
           done
+
+          exit 1
 
       - name: Push Docker image
         if: startsWith(github.ref, 'refs/tags/')
