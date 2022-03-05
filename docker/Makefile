@@ -2,6 +2,7 @@ REGISTRY := ghcr.io
 OWNER := thombashi
 USER := thombashi
 NAME := elasticsearch-faker
+REPO := $(REGISTRY)/$(OWNER)/$(NAME)
 
 VERSION := $(shell ./extract_version.sh)
 
@@ -24,8 +25,8 @@ docker-login: check-github-token
 
 .PHONY: docker-build
 docker-build:
-	docker build -t $(REGISTRY)/$(OWNER)/$(NAME):v$(VERSION) --pull . --build-arg version=$(VERSION)
+	docker build -t $(REPO):v$(VERSION) --pull . --build-arg version=$(VERSION)
 
 .PHONY: docker-push
 docker-push:
-	docker push $(REGISTRY)/$(OWNER)/$(NAME):v$(VERSION)
+	docker push $(REPO):v$(VERSION)
