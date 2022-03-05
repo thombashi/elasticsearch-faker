@@ -17,6 +17,7 @@ jobs:
       REGISTRY: "ghcr.io"
       OWNER: "thombashi"
       REPO: "elasticsearch-faker"
+      PLATFORMS: "linux/amd64,linux/arm64"
 
     steps:
       - uses: actions/checkout@v2
@@ -44,7 +45,7 @@ jobs:
 
           docker buildx build \
             -t "$IMAGE_TAG" \
-            --platform=linux/amd64,linux/arm64 \
+            --platform=$PLATFORMS \
             --build-arg version=$ES_FAKER_VERSION \
             --build-arg extras=$EXTRAS \
             --push .
