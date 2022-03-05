@@ -1,7 +1,7 @@
 click>=6.2,<9
 elasticsearch>=7.0.5,<8
 envinfopy>=0.0.3,<1
-Faker>=1.0.8,<12
+Faker>=1.0.8,<14
 Jinja2>=2.8,<4
 loguru>=0.4.1,<1
 Pygments>=2.2.0,<3
