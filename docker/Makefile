@@ -4,12 +4,18 @@ REPO := elasticsearch-faker
 
 VERSION := $(shell ./extract_version.sh)
 
+HADOLINT_VERSION := v2.8.0
+
 
 .PHONY: check-github-token
 check-github-token:
 ifndef GITHUB_TOKEN
 	$(error require GITHUB_TOKEN)
 endif
+
+.PHONY: lint-dockerfile
+lint-dockerfile:
+	docker run --rm -i hadolint/hadolint:$(HADOLINT_VERSION) < Dockerfile
 
 .PHONY: docker-login
 docker-login: check-github-token
