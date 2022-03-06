@@ -60,7 +60,6 @@ Installation: Docker container
 Usage
 ============================================
 
-
 Command help
 ----------------------------------------------
 ::
@@ -113,6 +112,72 @@ Command help
       -h, --help             Show this message and exit.
 
       Issue tracker: https://github.com/thombashi/elasticsearch-faker/issues
+
+Execution example
+----------------------------------------------
+Create 1000 docs to an index:
+
+:Execution:
+    ::
+
+        $ elasticsearch-faker generate --template doc_template.jinja2 localhost:9200 -n 1000
+        document generator #0: 100%|█████████████████████| 1000/1000 [00:01<00:00, 590.53docs/s]
+        [INFO] generate 1000 docs to test_index
+
+        [Results]
+        target index: test_index
+        completed in 2.5 secs
+        current store.size: 0.0 MB
+        current docs.count: 1,000
+        generated store.size: 0.0 MB
+        generated docs.count: 1,000
+        generated docs/secs: 395.3
+        bulk size: 200
+        $ curl -sS localhost:9200/test_index/_search | jq .hits.hits[:2]
+        [
+          {
+            "_index": "test_index",
+            "_type": "_doc",
+            "_id": "4bdd73c0-7744-4c6f-9736-50e3e8515f1c-0",
+            "_score": 1,
+            "_source": {
+              "name": "jennifer17",
+              "userId": 56561230,
+              "createdAt": "2009-07-17T06:31:04.000+0000",
+              "body": "Present blue happen thus miss toward. Itself race so successful build real beyond score. Look different she receive.Compare miss federal lawyer. Herself prevent approach east.",
+              "ext": "course",
+              "blobId": "c35769a9-3468-43fc-93c7-3c2f27ec9f64"
+            }
+          },
+          {
+            "_index": "test_index",
+            "_type": "_doc",
+            "_id": "88238d96-5ecc-4639-bb8f-c3f816027560-0",
+            "_score": 1,
+            "_source": {
+              "name": "dnicholson",
+              "userId": 457,
+              "createdAt": "2008-08-29T22:14:43.000+0000",
+              "body": "I sit another health president bring. Very expect international television job parent into.Authority read few stock. International hope yard left measure.Player them get move.",
+              "ext": "trial",
+              "blobId": "e43faf58-9b66-4a43-b1b7-7540b3996cde"
+            }
+          }
+        ]
+:doc template file (doc_template.jinja2):
+    .. code-block:: jinja
+
+        {
+          "name": "{{ user_name }}",
+          "userId": {{ random_number }},
+          "createdAt": "{{ date_time }}",
+          "body": "{{ text }}",
+          "ext": "{{ word }}",
+          "blobId": "{{ uuid4 }}"
+        }
+
+``{{ XXX }}`` used in the template file is called provider.
+The available providers can be listed by ``elasticsearch-faker provider list`` / ``elasticsearch-faker provider example`` subcommands.
 
 
 Dependencies
