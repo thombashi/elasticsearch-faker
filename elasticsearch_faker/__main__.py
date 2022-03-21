@@ -13,7 +13,7 @@ from tqdm import tqdm
 
 from .__version__ import __version__
 from ._const import COMMAND_EPILOG, MODULE_NAME, Context, Default
-from ._es_client import create_es_client
+from ._es_client import ElasticsearchClientInterface, create_es_client
 from ._generator import FakeDocGenerator
 from ._logger import LogLevel, initialize_logger, logger
 from ._print import print_dict
@@ -47,6 +47,25 @@ def _read_template_text(template_filepath: str, use_stdin: bool) -> str:
         sys.exit(errno.EINVAL)
 
     return template_text
+
+
+def _fetch_store_size_in_bytes(
+    es_client: ElasticsearchClientInterface, index_name: str, min_store_size_in_bytes: int
+) -> int:
+    store_size_in_bytes = 0
+
+    for _i in range(10):
+        primaries_stats_after = es_client.fetch_stats(index_name)["primaries"]
+        store_size_in_bytes = primaries_stats_after["store"]["size_in_bytes"]
+
+        if store_size_in_bytes >= min_store_size_in_bytes:
+            break
+
+        logger.debug(f"wait for docs stats to be reflected: current={store_size_in_bytes}bytes")
+
+        time.sleep(0.5)
+
+    return store_size_in_bytes
 
 
 def to_readable_size(size_in_bytes: int) -> float:
@@ -266,8 +285,10 @@ def generate(
 
     es_client.refresh(index_name=index_name)
 
-    primaries_stats_after = es_client.fetch_stats(index_name)["primaries"]
-    current_store_size = to_readable_size(primaries_stats_after["store"]["size_in_bytes"])
+    store_size_in_bytes = _fetch_store_size_in_bytes(
+        es_client, index_name=index_name, min_store_size_in_bytes=num_doc
+    )
+    current_store_size = to_readable_size(store_size_in_bytes)
     # current_docs_count = primaries_stats_after["docs"]["count"]
     current_docs_count = es_client.count_docs(index_name)
     diff_docs_count = current_docs_count - org_docs_count
