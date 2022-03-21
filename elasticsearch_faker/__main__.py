@@ -291,10 +291,11 @@ def generate(
 
     es_client.refresh(index_name=index_name)
 
-    store_size_in_bytes = _fetch_store_size_in_bytes(
-        es_client, index_name=index_name, min_store_size_in_bytes=num_doc
+    current_store_size_in_mb = to_megabytes(
+        _fetch_store_size_in_bytes(
+            es_client, index_name=index_name, min_store_size_in_bytes=num_doc
+        )
     )
-    current_store_size = to_megabytes(store_size_in_bytes)
     # current_docs_count = primaries_stats_after["docs"]["count"]
     current_docs_count = es_client.count_docs(index_name)
     diff_docs_count = current_docs_count - org_docs_count
@@ -306,10 +307,10 @@ def generate(
                 "\n[Results]",
                 f"target index: {index_name}",
                 f"completed in {elapse_secs:,.1f} secs",
-                f"current store.size: {current_store_size:,.1f} MB",
+                f"current store.size: {current_store_size_in_mb:,.1f} MB",
                 f"current docs.count: {current_docs_count:,}",
                 "generated store.size: {:,.1f} MB".format(
-                    current_store_size
+                    current_store_size_in_mb
                     - to_megabytes(primaries_stats_before["store"]["size_in_bytes"])
                 ),
                 f"generated docs.count: {diff_docs_count:,}",
