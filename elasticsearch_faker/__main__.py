@@ -312,7 +312,7 @@ def generate(
                     current_store_size_in_mb
                     - to_megabytes(primaries_stats_before["store"]["size_in_bytes"])
                 ),
-                f"average size[byte]/doc: {store_size_in_bytes / current_docs_count:,}",
+                f"average size[byte]/doc: {math.ceil(store_size_in_bytes / current_docs_count):,}",
                 f"generated docs.count: {diff_docs_count:,}",
                 f"generated docs/secs: {diff_docs_count / elapse_secs:,.1f}",
                 f"bulk size: {bulk_size:,}",
