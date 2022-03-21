@@ -126,7 +126,7 @@ def version(ctx):
     """,  # noqa
 )
 @click.option(
-    "--template", "template_filepath", type=click.Path(), help="Path to a faker template file."
+    "--template", "template_filepath", type=click.Path(), help="Path to a faker doc template file."
 )
 @click.option(
     "-n",
@@ -162,7 +162,7 @@ def version(ctx):
     default=1,
     help=f"Number of jobs. Defaults to {Default.NUM_WORKER}.",
 )
-@click.option("--stdin", "use_stdin", is_flag=True, help="Read a faker template from stdin.")
+@click.option("--stdin", "use_stdin", is_flag=True, help="Read a faker doc template from stdin.")
 @click.option("--dry-run", is_flag=True, help="Do no harm.")
 def generate(
     ctx,
@@ -334,7 +334,7 @@ def gen_doc_worker(
 @click.pass_context
 def validate(ctx, template_filepath: str):
     """
-    Check that a faker template file is well formed.
+    Check that a faker doc template file is well formed.
     """
 
     locale = ctx.obj[Context.LOCALE]
