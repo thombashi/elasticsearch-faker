@@ -1,4 +1,5 @@
 import errno
+import math
 import os
 import sys
 import time
@@ -50,11 +51,16 @@ def _read_template_text(template_filepath: str, use_stdin: bool) -> str:
 
 
 def _fetch_store_size_in_bytes(
-    es_client: ElasticsearchClientInterface, index_name: str, min_store_size_in_bytes: int
+    es_client: ElasticsearchClientInterface,
+    index_name: str,
+    min_store_size_in_bytes: int,
+    max_wait_secs: float = 10,
 ) -> int:
+    SLEEP_SECS = 0.5
+    max_loop = math.ceil(max_wait_secs / SLEEP_SECS)
     store_size_in_bytes = 0
 
-    for _i in range(10):
+    for _i in range(max_loop):
         primaries_stats_after = es_client.fetch_stats(index_name)["primaries"]
         store_size_in_bytes = primaries_stats_after["store"]["size_in_bytes"]
 
@@ -63,7 +69,7 @@ def _fetch_store_size_in_bytes(
 
         logger.debug(f"wait for docs stats to be reflected: current={store_size_in_bytes}bytes")
 
-        time.sleep(0.5)
+        time.sleep(SLEEP_SECS)
 
     return store_size_in_bytes
 
