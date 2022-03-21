@@ -2,10 +2,12 @@ import errno
 import os
 import sys
 import time
+import warnings
 from concurrent import futures
 from typing import Tuple
 
 import click
+from elasticsearch.exceptions import ElasticsearchWarning
 from faker import Factory, Faker
 from tqdm import tqdm
 
@@ -73,8 +75,9 @@ def to_readable_size(size_in_bytes: int) -> float:
     type=int,
     help="",
 )
+@click.option("--ignore-es-warn", is_flag=True, default=False, help="Ignore ElasticsearchWarning.")
 @click.pass_context
-def cmd(ctx, log_level: str, verbosity_level: int, locale: str, seed: int):
+def cmd(ctx, log_level: str, verbosity_level: int, locale: str, seed: int, ignore_es_warn: bool):
     """
     Faker for Elasticsearch.
     """
@@ -83,6 +86,9 @@ def cmd(ctx, log_level: str, verbosity_level: int, locale: str, seed: int):
     ctx.obj[Context.VERBOSITY_LEVEL] = verbosity_level
     ctx.obj[Context.LOCALE] = locale
     ctx.obj[Context.SEED] = seed
+
+    if ignore_es_warn:
+        warnings.simplefilter("ignore", ElasticsearchWarning)
 
     initialize_logger(name=MODULE_NAME, log_level=ctx.obj[Context.LOG_LEVEL])
     logger.debug(ctx.obj)
