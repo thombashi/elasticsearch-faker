@@ -85,4 +85,4 @@ def example(ctx, providers: List[str], max_len: int):
             continue
 
         str_value = str(value)
-        click.echo(f"{provider}: {str_value[:max_len]}")
+        click.echo(f"{provider} (len={len(str_value)}): {str_value[:max_len]}")
