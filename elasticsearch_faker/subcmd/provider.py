@@ -10,6 +10,9 @@ from .._logger import logger
 from .._provider import get_providers
 
 
+DEFAULT_MAX_DISPLAY_LEN = 64
+
+
 @click.group(epilog=COMMAND_EPILOG)
 def provider():
     """
@@ -50,15 +53,21 @@ def search(ctx, pattern: str):
 
 @provider.command()
 @click.argument("providers", type=str, nargs=-1)
+@click.option(
+    "--max-len",
+    metavar="LENGTH",
+    type=int,
+    default=DEFAULT_MAX_DISPLAY_LEN,
+    help=f"Maximum display length per example. Defaults to {DEFAULT_MAX_DISPLAY_LEN}.",
+)
 @click.pass_context
-def example(ctx, providers: List[str]):
+def example(ctx, providers: List[str], max_len: int):
     """
     List available providers with examples.
     """
 
     locale = ctx.obj[Context.LOCALE]
     seed = ctx.obj[Context.SEED]
-    limit = 64
 
     fake = Factory.create(locale)
     if seed is not None:
@@ -75,4 +84,5 @@ def example(ctx, providers: List[str]):
             logger.warning(f"provider={provider}: {e}")
             continue
 
-        click.echo(f"{provider}: {str(value)[:limit]}")
+        str_value = str(value)
+        click.echo(f"{provider}: {str_value[:max_len]}")
