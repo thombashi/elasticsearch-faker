@@ -60,14 +60,17 @@ def _fetch_store_size_in_bytes(
     max_loop = math.ceil(max_wait_secs / SLEEP_SECS)
     store_size_in_bytes = 0
 
-    for _i in range(max_loop):
+    for i in range(max_loop):
         primaries_stats_after = es_client.fetch_stats(index_name)["primaries"]
         store_size_in_bytes = primaries_stats_after["store"]["size_in_bytes"]
 
         if store_size_in_bytes >= min_store_size_in_bytes:
             break
 
-        logger.debug(f"wait for docs stats to be reflected: current={store_size_in_bytes}bytes")
+        logger.debug(
+            f"wait for docs stats to be reflected [{i}/{max_loop}]:"
+            f"current={store_size_in_bytes}bytes"
+        )
 
         time.sleep(SLEEP_SECS)
 
