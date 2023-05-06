@@ -13,31 +13,31 @@ from ._logger import logger
 
 
 class ElasticsearchClientInterface(metaclass=abc.ABCMeta):
-    @abc.abstractclassmethod
+    @abc.abstractmethod
     def create_index(self, index_name: str, mapping_filepath: str) -> None:
         pass
 
-    @abc.abstractclassmethod
+    @abc.abstractmethod
     def delete_index(self, index_name: str) -> None:
         pass
 
-    @abc.abstractclassmethod
+    @abc.abstractmethod
     def put(self, index_name: str, doc: Dict) -> int:
         pass
 
-    @abc.abstractclassmethod
+    @abc.abstractmethod
     def bulk_put(self, index_name: str, docs: List[Dict]) -> int:
         pass
 
-    @abc.abstractclassmethod
+    @abc.abstractmethod
     def refresh(self, index_name: str) -> None:
         pass
 
-    @abc.abstractclassmethod
+    @abc.abstractmethod
     def count_docs(self, index_name: str) -> int:
         pass
 
-    @abc.abstractclassmethod
+    @abc.abstractmethod
     def fetch_stats(self, index_name: str) -> Dict:
         pass
 
