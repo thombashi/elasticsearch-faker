@@ -54,21 +54,6 @@ jobs:
 
           exit 1
 
-      - name: Build and push Docker images - es7
-        working-directory: docker
-        env:
-          ES_FAKER_VERSION: ${{ steps.extract-version.outputs.version }}
-          EXTRAS: es7
-        run: |
-          IMAGE_TAG=${REGISTRY}/${OWNER}/${REPO}:${ES_FAKER_VERSION}-${EXTRAS}
-
-          docker buildx build \
-            -t "$IMAGE_TAG" \
-            --platform=$PLATFORMS \
-            --build-arg version=$ES_FAKER_VERSION \
-            --build-arg extras=$EXTRAS \
-            --push .
-
       - name: Build and push Docker images - es8
         working-directory: docker
         env:

@@ -46,11 +46,6 @@ jobs:
       - name: Setup build
         run: make setup-deb-build
 
-      - name: Build deb package - es7
-        run: |
-          ./build_deb_package.sh es7
-          ls -lh ${DIST_DIR_NAME}/*
-
       - name: Build deb package - es8
         run: |
           ./build_deb_package.sh es8
