@@ -14,7 +14,7 @@ class LogLevel:
     QUIET = "QUIET"
 
 
-def set_logger(is_enable: bool, propagation_depth: int = 1):
+def set_logger(is_enable: bool, propagation_depth: int = 1) -> None:
     if is_enable:
         logger.enable(MODULE_NAME)
     else:
