@@ -33,7 +33,7 @@ with open(os.path.join(REQUIREMENT_DIR, "requirements.txt")) as f:
 with open(os.path.join(REQUIREMENT_DIR, "test_requirements.txt")) as f:
     TESTS_REQUIRES = [line.strip() for line in f if line.strip()]
 
-build_exe_requires = ["pyinstaller>=4.9", "text-unidecode"]
+build_exe_requires = ["pyinstaller>=5.10.1", "text-unidecode"]
 
 setuptools.setup(
     name=MODULE_NAME,
