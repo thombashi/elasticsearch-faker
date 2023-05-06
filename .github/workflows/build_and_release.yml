@@ -95,7 +95,7 @@ jobs:
           cd "$DIST_DIR_NAME"
           sha256sum ${BIN_NAME}_* > "../${SHA_DIR}/${SHA_TEXT_FILE}"
 
-          echo "::set-output name=filename::${SHA_DIR}/${SHA_TEXT_FILE}"
+          echo "filename=${SHA_DIR}/${SHA_TEXT_FILE}" >> $GITHUB_OUTPUT
 
       - uses: actions/upload-artifact@v3
         with:
