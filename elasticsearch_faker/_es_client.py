@@ -90,7 +90,7 @@ class ElasticsearchClient(ElasticsearchClientInterface):
             result = self.__es.indices.create(index=index_name, body=mappings)
             logger.debug(result)
         except TransportError as e:
-            if e.error == "resource_already_exists_exception":
+            if e.errors == "resource_already_exists_exception":
                 # ignore already existing index
                 logger.debug(e)
             else:
