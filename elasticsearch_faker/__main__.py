@@ -154,7 +154,11 @@ def version(ctx):
     """,  # noqa
 )
 @click.option(
-    "--template", "template_filepath", type=click.Path(), help="Path to a faker doc template file."
+    "--doc-template",
+    "--template",
+    "template_filepath",
+    type=click.Path(),
+    help="Path to a faker doc template file.",
 )
 @click.option(
     "-n",
