@@ -14,7 +14,7 @@ from faker import Factory, Faker
 from tqdm import tqdm
 
 from .__version__ import __version__
-from ._const import COMMAND_EPILOG, MODULE_NAME, Context, Default
+from ._const import COMMAND_EPILOG, MODULE_NAME, Context, Default, Environment
 from ._es_client import ElasticsearchClientInterface, ElasticsearchClientParameter, create_es_client
 from ._generator import FakeDocGenerator
 from ._logger import LogLevel, initialize_logger, logger
@@ -31,21 +31,21 @@ def _extract_basic_auth_user(user: Optional[str]) -> Optional[str]:
     if user:
         return user
 
-    return os.getenv("ES_BASIC_AUTH_USER")
+    return os.getenv(Environment.BASIC_AUTH_USER)
 
 
 def _extract_basic_auth_password(password: Optional[str]) -> Optional[str]:
     if password:
         return password
 
-    return os.getenv("ES_BASIC_AUTH_PASSWORD")
+    return os.getenv(Environment.BASIC_AUTH_PASSWORD)
 
 
 def _extract_ssl_assert_fingerprint(fingerprint: Optional[str]) -> Optional[str]:
     if fingerprint:
         return fingerprint
 
-    return os.getenv("ES_SSL_ASSERT_FINGERPRINT")
+    return os.getenv(Environment.SSL_ASSERT_FINGERPRINT)
 
 
 def _read_template_text(template_filepath: str, use_stdin: bool) -> str:
