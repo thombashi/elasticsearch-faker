@@ -16,7 +16,7 @@ DEFAULT_MAX_DISPLAY_LEN = 64
 @click.group(epilog=COMMAND_EPILOG)
 def provider():
     """
-    Show or search providers for template.
+    Show or search providers for doc templates.
     """
 
 

@@ -174,7 +174,7 @@ def version(ctx):
     type=int,
     default=Default.NUM_DOC,
     help="""
-        Number of generating documents. Using bulk API if the value equals or greater than two.
+        Number of generating documents. The command uses bulk API if the value equals or is greater than two.
         Defaults to {}.
     """.format(
         Default.NUM_DOC
