@@ -5,7 +5,7 @@ import sys
 import time
 import warnings
 from concurrent import futures
-from typing import Tuple
+from typing import Optional, Tuple
 
 import click
 from elasticsearch.exceptions import ElasticsearchWarning
@@ -105,7 +105,14 @@ def to_megabytes(size_in_bytes: int) -> float:
 )
 @click.option("--ignore-es-warn", is_flag=True, default=False, help="Ignore ElasticsearchWarning.")
 @click.pass_context
-def cmd(ctx, log_level: str, verbosity_level: int, locale: str, seed: int, ignore_es_warn: bool):
+def cmd(
+    ctx,
+    log_level: str,
+    verbosity_level: int,
+    locale: str,
+    seed: Optional[int],
+    ignore_es_warn: bool,
+):
     """
     Faker for Elasticsearch.
     """
