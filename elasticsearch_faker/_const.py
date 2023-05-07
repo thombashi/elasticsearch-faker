@@ -22,6 +22,10 @@ class Context(Enum):
     VERBOSITY_LEVEL = 10
     LOCALE = 20
     SEED = 30
+    BASIC_AUTH_USER = 40
+    BASIC_AUTH_PASSWORD = 41
+    VERIFY_CERTS = 50
+    SSL_ASSERT_FINGERPRINT = 51
 
 
 class Default:

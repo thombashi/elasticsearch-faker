@@ -3,15 +3,17 @@ import errno
 import json
 import os
 import sys
-from typing import Dict, List
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Tuple
 
 from elasticsearch import Elasticsearch
 from elasticsearch.exceptions import (
     AuthenticationException,
     BadRequestError,
+    ConnectionError,
     NotFoundError,
     RequestError,
-    ConnectionError
+    TransportError,
 )
 
 from ._const import Default
@@ -96,6 +98,12 @@ class ElasticsearchClient(ElasticsearchClientInterface):
         try:
             result = self.__es.indices.create(index=index_name, body=mappings)
             logger.debug(result)
+        except AuthenticationException as e:
+            logger.error(e)
+            return errno.EACCES
+        except ConnectionError as e:
+            logger.error(e)
+            return errno.ECOMM
         except BadRequestError as e:
             if e.error == "resource_already_exists_exception":
                 logger.debug(f"skip existing index creation: {e}")
@@ -162,6 +170,9 @@ class ElasticsearchClient(ElasticsearchClientInterface):
     def fetch_stats(self, index_name: str) -> Dict:
         try:
             stats = self.__es.indices.stats(index=index_name, metric="_all")
+        except AuthenticationException as e:
+            logger.error(e)
+            sys.exit(errno.EPERM)
         except NotFoundError as e:
             logger.error(e)
             sys.exit(errno.ENOENT)
@@ -169,12 +180,36 @@ class ElasticsearchClient(ElasticsearchClientInterface):
         return stats["indices"][index_name]
 
 
-def create_es_client(endpoint: str, dry_run: bool) -> ElasticsearchClientInterface:
+@dataclass
+class ElasticsearchClientParameter:
+    endpoint: str
+    verify_certs: bool = False
+    basic_auth_user: Optional[str] = None
+    basic_auth_password: Optional[str] = None
+    ssl_assert_fingerprint: Optional[str] = None
+
+    @property
+    def basic_auth(self) -> Optional[Tuple[str, str]]:
+        if self.basic_auth_user is None or self.basic_auth_password is None:
+            return None
+
+        return (self.basic_auth_user, self.basic_auth_password)
+
+
+def create_es_client(
+    es_client_param: ElasticsearchClientParameter, dry_run: bool
+) -> ElasticsearchClientInterface:
     if dry_run:
         return NullElasticsearchClient()
 
     try:
-        es = Elasticsearch(hosts=[endpoint], sniff_on_start=False)
+        es = Elasticsearch(
+            hosts=[es_client_param.endpoint],
+            sniff_on_start=False,
+            verify_certs=es_client_param.verify_certs,
+            basic_auth=es_client_param.basic_auth,
+            ssl_assert_fingerprint=es_client_param.ssl_assert_fingerprint,
+        )
     except TransportError as e:
         logger.error(e)
         sys.exit(errno.ENETUNREACH)

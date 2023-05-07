@@ -1,3 +1,4 @@
+import copy
 import errno
 import math
 import os
@@ -14,7 +15,7 @@ from tqdm import tqdm
 
 from .__version__ import __version__
 from ._const import COMMAND_EPILOG, MODULE_NAME, Context, Default
-from ._es_client import ElasticsearchClientInterface, create_es_client
+from ._es_client import ElasticsearchClientInterface, ElasticsearchClientParameter, create_es_client
 from ._generator import FakeDocGenerator
 from ._logger import LogLevel, initialize_logger, logger
 from ._print import print_dict
@@ -24,6 +25,27 @@ from .subcmd.provider import provider
 
 
 CONTEXT_SETTINGS = dict(help_option_names=["-h", "--help"], obj={})
+
+
+def _extract_basic_auth_user(user: Optional[str]) -> Optional[str]:
+    if user:
+        return user
+
+    return os.getenv("ES_BASIC_AUTH_USER")
+
+
+def _extract_basic_auth_password(password: Optional[str]) -> Optional[str]:
+    if password:
+        return password
+
+    return os.getenv("ES_BASIC_AUTH_PASSWORD")
+
+
+def _extract_ssl_assert_fingerprint(fingerprint: Optional[str]) -> Optional[str]:
+    if fingerprint:
+        return fingerprint
+
+    return os.getenv("ES_SSL_ASSERT_FINGERPRINT")
 
 
 def _read_template_text(template_filepath: str, use_stdin: bool) -> str:
@@ -103,6 +125,23 @@ def to_megabytes(size_in_bytes: int) -> float:
     type=int,
     help="Random seed for faker.",
 )
+@click.option(
+    "--basic-auth-user",
+    help="User name for Elasticsearch basic authentication.",
+)
+@click.option(
+    "--basic-auth-password",
+    help="Password for Elasticsearch basic authentication.",
+)
+@click.option(
+    "--verify-certs",
+    is_flag=True,
+    help="Verify Elasticsearch server certificate.",
+)
+@click.option(
+    "--ssl-assert-fingerprint",
+    help="SSL certificate fingerprint to verify.",
+)
 @click.option("--ignore-es-warn", is_flag=True, default=False, help="Ignore ElasticsearchWarning.")
 @click.pass_context
 def cmd(
@@ -111,6 +150,10 @@ def cmd(
     verbosity_level: int,
     locale: str,
     seed: Optional[int],
+    basic_auth_user: Optional[str],
+    basic_auth_password: Optional[str],
+    verify_certs: bool,
+    ssl_assert_fingerprint: Optional[str],
     ignore_es_warn: bool,
 ):
     """
@@ -121,12 +164,20 @@ def cmd(
     ctx.obj[Context.VERBOSITY_LEVEL] = verbosity_level
     ctx.obj[Context.LOCALE] = locale
     ctx.obj[Context.SEED] = seed
+    ctx.obj[Context.BASIC_AUTH_USER] = _extract_basic_auth_user(basic_auth_user)
+    ctx.obj[Context.BASIC_AUTH_PASSWORD] = basic_auth_password
+    ctx.obj[Context.VERIFY_CERTS] = verify_certs
+    ctx.obj[Context.SSL_ASSERT_FINGERPRINT] = ssl_assert_fingerprint
 
     if ignore_es_warn:
         warnings.simplefilter("ignore", ElasticsearchWarning)
 
     initialize_logger(name=MODULE_NAME, log_level=ctx.obj[Context.LOG_LEVEL])
-    logger.debug(ctx.obj)
+
+    context = copy.deepcopy(ctx.obj)
+    del context[Context.BASIC_AUTH_PASSWORD]
+    del context[Context.SSL_ASSERT_FINGERPRINT]
+    logger.debug(context)
 
 
 @cmd.command(epilog=COMMAND_EPILOG)
@@ -239,7 +290,16 @@ def generate(
     if seed is not None:
         Faker.seed(seed)
 
-    es_client = create_es_client(endpoint, dry_run)
+    es_client_param = ElasticsearchClientParameter(
+        endpoint=endpoint,
+        basic_auth_user=ctx.obj[Context.BASIC_AUTH_USER],
+        basic_auth_password=_extract_basic_auth_password(ctx.obj[Context.BASIC_AUTH_PASSWORD]),
+        verify_certs=ctx.obj[Context.VERIFY_CERTS],
+        ssl_assert_fingerprint=_extract_ssl_assert_fingerprint(
+            ctx.obj[Context.SSL_ASSERT_FINGERPRINT]
+        ),
+    )
+    es_client = create_es_client(es_client_param, dry_run)
 
     if delete_index:
         es_client.delete_index(index_name)
@@ -263,7 +323,7 @@ def generate(
 
     if num_worker == 1:
         _, gen_doc_count = gen_doc_worker(
-            endpoint=endpoint,
+            es_client_param=es_client_param,
             dry_run=dry_run,
             doc_generator=doc_generator,
             index_name=index_name,
@@ -286,7 +346,7 @@ def generate(
                 future_list.append(
                     executor.submit(
                         gen_doc_worker,
-                        endpoint,
+                        es_client_param,
                         dry_run,
                         doc_generator,
                         index_name,
@@ -339,7 +399,7 @@ def generate(
 
 
 def gen_doc_worker(
-    endpoint: str,
+    es_client_param: ElasticsearchClientParameter,
     dry_run: bool,
     doc_generator: FakeDocGenerator,
     index_name: str,
@@ -347,7 +407,7 @@ def gen_doc_worker(
     bulk_size: int,
     worker_id: int = 0,
 ) -> Tuple[int, int]:
-    es_client = create_es_client(endpoint, dry_run)
+    es_client = create_es_client(es_client_param, dry_run)
     gen_doc_count = 0
 
     with tqdm(
@@ -404,7 +464,19 @@ def show_stats(ctx, endpoint: str, index_name: str):
     """
     Fetch and show statistics of an index.
     """
-    es_client = create_es_client(endpoint, dry_run=False)
+
+    es_client = create_es_client(
+        ElasticsearchClientParameter(
+            endpoint=endpoint,
+            basic_auth_user=ctx.obj[Context.BASIC_AUTH_USER],
+            basic_auth_password=_extract_basic_auth_password(ctx.obj[Context.BASIC_AUTH_PASSWORD]),
+            verify_certs=ctx.obj[Context.VERIFY_CERTS],
+            ssl_assert_fingerprint=_extract_ssl_assert_fingerprint(
+                ctx.obj[Context.SSL_ASSERT_FINGERPRINT]
+            ),
+        ),
+        dry_run=False,
+    )
     stats = es_client.fetch_stats(index_name)
 
     try:
