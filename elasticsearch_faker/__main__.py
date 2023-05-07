@@ -127,16 +127,25 @@ def to_megabytes(size_in_bytes: int) -> float:
 )
 @click.option(
     "--basic-auth-user",
-    help="User name for Elasticsearch basic authentication.",
+    help=f"""
+        User name for Elasticsearch basic authentication.
+        Or you can set the value via {Environment.BASIC_AUTH_USER} environment variable.
+    """,
 )
 @click.option(
     "--basic-auth-password",
-    help="Password for Elasticsearch basic authentication.",
+    help=f"""
+        Password for Elasticsearch basic authentication.
+        Or you can set the value via {Environment.BASIC_AUTH_PASSWORD} environment variable.
+    """,
 )
 @click.option(
     "--verify-certs",
     is_flag=True,
-    help="Verify Elasticsearch server certificate.",
+    help=f"""
+        Verify Elasticsearch server certificate.
+        Or you can set the value via {Environment.SSL_ASSERT_FINGERPRINT} environment variable.
+    """,
 )
 @click.option(
     "--ssl-assert-fingerprint",
