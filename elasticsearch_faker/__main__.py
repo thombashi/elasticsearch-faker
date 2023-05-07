@@ -101,7 +101,7 @@ def to_megabytes(size_in_bytes: int) -> float:
 @click.option(
     "--seed",
     type=int,
-    help="",
+    help="Random seed for faker.",
 )
 @click.option("--ignore-es-warn", is_flag=True, default=False, help="Ignore ElasticsearchWarning.")
 @click.pass_context
@@ -199,7 +199,7 @@ def version(ctx):
     "num_worker",
     type=int,
     default=1,
-    help=f"Number of jobs. Defaults to {Default.NUM_WORKER}.",
+    help=f"Number of workers that create docs. Defaults to {Default.NUM_WORKER}.",
 )
 @click.option("--stdin", "use_stdin", is_flag=True, help="Read a faker doc template from stdin.")
 @click.option("--dry-run", is_flag=True, help="Do no harm.")
