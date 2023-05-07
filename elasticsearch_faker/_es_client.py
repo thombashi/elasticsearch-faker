@@ -156,7 +156,8 @@ class ElasticsearchClient(ElasticsearchClientInterface):
         self.__es.indices.refresh(index=index_name, request_timeout=Default.TIMEOUT)
 
     def count_docs(self, index_name: str) -> int:
-        return int(self.__es.cat.count(index=index_name, params={"h": "count"}))
+        resp = self.__es.cat.count(index=index_name, params={"h": "count"})
+        return int(str(resp))
 
     def fetch_stats(self, index_name: str) -> Dict:
         try:
