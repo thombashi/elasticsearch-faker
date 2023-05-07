@@ -80,7 +80,7 @@ def example(ctx, providers: List[str], max_len: int):
             # implemented providers may differ locale to locale
             logger.debug(f"provider not found: locale={locale}, provider={provider}")
             continue
-        except UnsupportedFeature as e:
+        except (TypeError, UnsupportedFeature) as e:
             logger.warning(f"provider={provider}: {e}")
             continue
 
