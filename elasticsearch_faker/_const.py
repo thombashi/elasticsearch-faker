@@ -30,3 +30,4 @@ class Default:
     NUM_DOC = 1000
     NUM_WORKER = 1
     TIMEOUT = 300
+    LOCALE = "en_US"

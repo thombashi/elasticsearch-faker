@@ -95,8 +95,8 @@ def to_megabytes(size_in_bytes: int) -> float:
 @click.option(
     "--locale",
     type=click.Choice(get_locals()),
-    default="en_US",
-    help="Specify localization for fake data. Defaults to en_US.",
+    default=Default.LOCALE,
+    help=f"Specify localization for fake data. Defaults to {Default.LOCALE}.",
 )
 @click.option(
     "--seed",
