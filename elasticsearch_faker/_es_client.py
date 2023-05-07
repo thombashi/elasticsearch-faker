@@ -20,8 +20,8 @@ from ._logger import logger
 
 class ElasticsearchClientInterface(metaclass=abc.ABCMeta):
     @abc.abstractmethod
-    def create_index(self, index_name: str, mapping_filepath: str) -> None:
-        pass
+    def create_index(self, index_name: str, mapping_filepath: str) -> int:
+        return 0
 
     @abc.abstractmethod
     def delete_index(self, index_name: str) -> None:
@@ -49,8 +49,9 @@ class ElasticsearchClientInterface(metaclass=abc.ABCMeta):
 
 
 class NullElasticsearchClient(ElasticsearchClientInterface):
-    def create_index(self, index_name: str, mapping_filepath: str) -> None:
+    def create_index(self, index_name: str, mapping_filepath: str) -> int:
         logger.debug(f"create index: {index_name}")
+        return 0
 
     def delete_index(self, index_name: str) -> None:
         logger.debug(f"delete index: {index_name}")
@@ -80,14 +81,14 @@ class ElasticsearchClient(ElasticsearchClientInterface):
     def __init__(self, es: Elasticsearch) -> None:
         self.__es = es
 
-    def create_index(self, index_name: str, mapping_filepath: str) -> None:
+    def create_index(self, index_name: str, mapping_filepath: str) -> int:
         logger.debug(f"create index: {index_name}")
 
         mappings = {}
         if mapping_filepath:
             if not os.path.exists(mapping_filepath):
                 logger.error(f"mapping file not found: {mapping_filepath}")
-                sys.exit(errno.ENOENT)
+                return errno.ENOENT
 
             with open(mapping_filepath) as f:
                 mappings = json.load(f)
@@ -100,6 +101,8 @@ class ElasticsearchClient(ElasticsearchClientInterface):
                 logger.debug(f"skip existing index creation: {e}")
             else:
                 raise
+
+        return 0
 
     def delete_index(self, index_name: str) -> None:
         logger.debug(f"delete index: {index_name}")

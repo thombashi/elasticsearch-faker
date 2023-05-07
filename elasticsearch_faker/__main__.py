@@ -237,7 +237,10 @@ def generate(
     if delete_index:
         es_client.delete_index(index_name)
 
-    es_client.create_index(index_name, mapping_filepath)
+    err = es_client.create_index(index_name, mapping_filepath)
+    if err != 0:
+        sys.exit(err)
+
     primaries_stats_before = es_client.fetch_stats(index_name)["primaries"]
     org_docs_count = es_client.count_docs(index_name)
 
