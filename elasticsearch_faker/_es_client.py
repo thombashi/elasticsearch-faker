@@ -6,7 +6,13 @@ import sys
 from typing import Dict, List
 
 from elasticsearch import Elasticsearch
-from elasticsearch.exceptions import NotFoundError, RequestError, TransportError
+from elasticsearch.exceptions import (
+    AuthenticationException,
+    BadRequestError,
+    NotFoundError,
+    RequestError,
+    ConnectionError
+)
 
 from ._const import Default
 from ._logger import logger
@@ -89,10 +95,9 @@ class ElasticsearchClient(ElasticsearchClientInterface):
         try:
             result = self.__es.indices.create(index=index_name, body=mappings)
             logger.debug(result)
-        except TransportError as e:
-            if e.errors == "resource_already_exists_exception":
-                # ignore already existing index
-                logger.debug(e)
+        except BadRequestError as e:
+            if e.error == "resource_already_exists_exception":
+                logger.debug(f"skip existing index creation: {e}")
             else:
                 raise
 
