@@ -11,6 +11,10 @@ Summary
     :target: https://badge.fury.io/py/elasticsearch-faker
     :alt: PyPI package version
 
+.. image:: https://img.shields.io/pypi/pyversions/elasticsearch-faker.svg
+    :target: https://pypi.org/project/elasticsearch-faker
+    :alt: Supported Python versions
+
 .. image:: https://github.com/thombashi/elasticsearch-faker/workflows/Tests/badge.svg
     :target: https://github.com/thombashi/elasticsearch-faker/actions?query=workflow%3ATests
     :alt: Tests CI status
@@ -18,10 +22,6 @@ Summary
 .. image:: https://github.com/thombashi/elasticsearch-faker/actions/workflows/build_and_release.yml/badge.svg
     :target: https://github.com/thombashi/elasticsearch-faker/actions/workflows/build_and_release.yml
     :alt: Build and release CI status
-
-.. image:: https://github.com/thombashi/elasticsearch-faker/actions/workflows/codeql-analysis.yml/badge.svg
-    :target: https://github.com/thombashi/elasticsearch-faker/actions/workflows/codeql-analysis.yml
-    :alt: CodeQL
 
 
 Installation
