@@ -60,11 +60,18 @@ jobs:
           ES_FAKER_VERSION: ${{ steps.extract-version.outputs.version }}
           EXTRAS: es8
         run: |
+          set -x
+
           IMAGE_TAG=${REGISTRY}/${OWNER}/${REPO}:${ES_FAKER_VERSION}-${EXTRAS}
+          PUSH_OPTION=
+
+          if echo "${{ github.ref }}" | grep -q "refs/tags/"; then
+            PUSH_OPTION=--push
+          fi
 
           docker buildx build \
             -t "$IMAGE_TAG" \
             --platform=$PLATFORMS \
             --build-arg version=$ES_FAKER_VERSION \
             --build-arg extras=$EXTRAS \
-            --push .
+            $PUSH_OPTION .
