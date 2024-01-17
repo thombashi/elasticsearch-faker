@@ -103,7 +103,7 @@ class ElasticsearchClient(ElasticsearchClientInterface):
             return errno.EACCES
         except ConnectionError as e:
             logger.error(e)
-            return errno.ECOMM
+            return errno.EDOM
         except BadRequestError as e:
             if e.error == "resource_already_exists_exception":
                 logger.debug(f"skip existing index creation: {e}")
