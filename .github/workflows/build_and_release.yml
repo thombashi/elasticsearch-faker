@@ -72,7 +72,7 @@ jobs:
       SHA_TEXT_FILE: elasticsearch-faker_sha256.txt
 
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4.1.7
         with:
           name: binaries
           path: ${{ env.DIST_DIR_NAME }}
